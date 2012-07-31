@@ -32,7 +32,7 @@ public class OAuth1 extends OAuth {
         System.debug('Completing authorization for request token ' + token);
         try {
             Id userId = UserInfo.getUserId();
-            OAuth_Token__c t = [Select Id From OAuth_Token__c Where Owner__c = :userId And OAuth_Token__c = :token Order By CreatedDate DESC Limit 1];
+            OAuth_Token__c t = [Select Id, Oauth_Service__r.Id From OAuth_Token__c Where Owner__c = :userId And OAuth_Token__c = :token Order By CreatedDate DESC Limit 1];
             return new OAuth1(t.Oauth_Service__r.Id);
         } catch (System.QueryException e) {
             throw new OAuth1Exception('no token');
