@@ -63,7 +63,7 @@ public class OAuthSign {
     }
 
     private String join(String key, String value) {
-        return EncodingUtil.urlEncode(key, 'UTF-8') + '=' + EncodingUtil.urlEncode(value, 'UTF-8');
+        return percentEncode(key) + '=' + percentEncode(value);
     }
 
     private String join(List<String> values, String sep) {
@@ -104,8 +104,8 @@ public class OAuthSign {
         }
 
         String signature = req.getMethod().toUpperCase() +
-            '&' + EncodingUtil.urlEncode(host, 'UTF-8') +
-            '&' + EncodingUtil.urlEncode(getNormalizedRequestParameterString(), 'UTF-8');
+            '&' + percentEncode(host) +
+            '&' + percentEncode(getNormalizedRequestParameterString());
 
         this.parameters = org;
         return signature;
@@ -114,10 +114,11 @@ public class OAuthSign {
     private String getSignature(HttpRequest req, String consumer_secret, String token_secret) {
         String str = getSignatureBaseString(req);
         System.debug('Signature base string: ' + str);
-        String secret = EncodingUtil.urlEncode(consumer_secret, 'UTF-8') + '&';
+        String secret = percentEncode(consumer_secret) + '&';
         if (token_secret != null) {
-            secret += EncodingUtil.urlEncode(token_secret, 'UTF-8');
+            secret += percentEncode(token_secret);
         }
+        System.debug('HmacSHA1 secret: ' + secret);
         Blob sig = Crypto.generateMac(
             'HmacSHA1',
             Blob.valueOf(str),
@@ -139,9 +140,15 @@ public class OAuthSign {
         for (String key : keys) {
             List<String> v = this.parameters.get(key);
             if (key.startsWith('oauth_') && v.size() > 0) {
-                values.add(EncodingUtil.urlEncode(key, 'UTF-8') + '="' + EncodingUtil.urlEncode(v[0], 'UTF-8') + '"');
+                values.add(percentEncode(key) + '="' + percentEncode(v[0]) + '"');
             }
         }
         return 'OAuth ' + join(values, ', ');
+    }
+
+    private String percentEncode(String str) {
+        str = EncodingUtil.urlEncode(str, 'UTF-8');
+        str = str.replaceAll('%7e|%7E', '~');
+        return str;
     }
 }
