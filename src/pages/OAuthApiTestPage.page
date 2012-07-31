@@ -1,0 +1,51 @@
+<apex:page controller="OAuthApiTestController">
+    <apex:outputText value="{!message}"/><br />
+    <br />
+    <apex:form >
+        <apex:outputPanel id="RequestComponents">
+            <table>
+                <tr>
+                    <th>Service:</th>
+                    <td>
+                        <apex:selectList value="{!service}" size="1">
+                            <apex:selectOptions value="{!serviceOptions}"/>
+                            <apex:actionSupport event="onchange" rerender="RequestComponents"/>
+                        </apex:selectList>
+                        <apex:selectList size="1" id="savedURLsComp" value="{!serviceUrl}">
+                            <apex:selectOptions value="{!serviceUrlOptions}"/>
+                            <apex:actionSupport event="onchange" action="{!loadURL}" rerender="RequestComponents"/>
+                        </apex:selectList>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Method:</th>
+                    <td>
+                        <apex:selectList value="{!method}" size="1">
+                            <apex:selectOptions value="{!methodOptions}"/>
+                        </apex:selectList>
+                    </td>
+                </tr>
+                <tr>
+                    <th>URL:</th>
+                    <td>
+                        <apex:inputText id="urlTextComp" value="{!url}" size="80"/>
+                        <apex:commandButton action="{!execute}" value="Send" disabled="{!service == null}" />
+                        <!-- apex:commandButton action="{!saveURL}" value="Save" rerender="savedURLsComp" disabled="{!service == null}" / -->
+                    </td>
+                </tr>
+                <tr>
+                    <th>Body:</th>
+                    <td>
+                        <apex:inputText value="{!postParam}" size="88"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Response:</th>
+                    <td>
+                        <apex:inputTextarea value="{!body}" rows="30" cols="100"/>
+                    </td>
+                </tr>
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

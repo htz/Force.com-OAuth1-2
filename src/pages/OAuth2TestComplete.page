@@ -1,0 +1,4 @@
+<apex:page controller="OAuthAuthorizeTestController" action="{!completeAuthorization2}" tabStyle="OAuth_Authorize_Tester__tab">
+    <apex:outputText rendered="{!authSuccess}" value="Authorization successful"/>
+    <apex:outputText rendered="{!(!authSuccess)}" value="Not Authorized: {!message}"/>
+</apex:page>

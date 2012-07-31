@@ -1,0 +1,7 @@
+<apex:page controller="OAuthTwitterSampleController" action="{!init}">
+    <apex:form >
+        <apex:commandButton value="Refresh" reRender="feed" />
+        <br />
+        <apex:inputTextarea readonly="true" value="{!feed}" id="feed" cols="100" rows="50" />        
+    </apex:form>
+</apex:page>
