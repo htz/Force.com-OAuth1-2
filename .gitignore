@@ -1,0 +1,10 @@
+build.*
+.DS_Store*
+.settings/*
+.project
+ehthumbs.db
+Icon?
+package.xml
+salesforce.schema
+Thumbs.db
+
