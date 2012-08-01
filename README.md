@@ -28,10 +28,15 @@ Oauth 2.0
 * Facebook
 * Google
 * foursquare
+* GitHub
 
 ## Apex Classes
 
 ## Sample Code
+
+# Reference RFC
+* http://tools.ietf.org/html/draft-ietf-oauth-v2-30
+* http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-22
 
 # License
 
