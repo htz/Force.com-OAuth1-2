@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customButtons>Authorizaion</customButtons>
+    <excludeButtons>Submit</excludeButtons>
     <layoutSections>
         <customLabel>false</customLabel>
         <detailHeading>false</detailHeading>
@@ -47,6 +49,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Redirect_URL__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Authorization_Type__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>

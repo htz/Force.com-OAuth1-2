@@ -1,0 +1,2 @@
+<apex:page standardController="OAuthService__c" extensions="OAuthAuthorizeController" action="{!init}">
+</apex:page>

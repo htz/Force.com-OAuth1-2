@@ -10,9 +10,20 @@ public class OAuth2 extends OAuth {
         try {
             service = [
                 Select
-                    Name, Response_Type__c, Consumer_Key__c, Consumer_Secret__c,
+                    Name, Authorization_Type__c, Response_Type__c, Consumer_Key__c, Consumer_Secret__c,
                     Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c, Scope__c, State__c,
-                    (Select Access_Token__c, Refresh_Token__c, Expires_In__c FROM OAuth2_Tokens__r WHERE Owner__c = :userId Order By CreatedDate DESC Limit 1)
+                    (
+                    	Select
+                    		Access_Token__c, Token_Type__c, Refresh_Token__c,
+                    		Expires_In__c, Expires_Date__c, Scope__c
+                    	From
+							OAuth2_Tokens__r
+						Where
+							Owner__c = :userId
+						Order By
+							CreatedDate DESC
+						Limit 1
+					)
                 From
                     OAuthService__c
                 WHERE
@@ -72,7 +83,7 @@ public class OAuth2 extends OAuth {
         return getAccessTokenCommonBody(grant_type, null);
     }
 
-    /* grant_type=authorization_code */
+    /* Authorization Code Grant */
     public Boolean getAccessTokenAuthorizationCode(String code) {
         String body =
             getAccessTokenCommonBody('authorization_code', service.Scope__c) + // scope間違い
@@ -86,7 +97,9 @@ public class OAuth2 extends OAuth {
         return true;
     }
 
-    /* grant_type=password */
+	/* Implicit Grant */
+
+    /* Resource Owner Password Credentials Grant */
     public Boolean getAccessTokenAuthorizationPassword(String username, String password) {
         String body =
             getAccessTokenCommonBody('password', service.Scope__c) + // scope間違い
@@ -98,18 +111,9 @@ public class OAuth2 extends OAuth {
         return true;
     }
 
-    /* grant_type=assertion */
-    public Boolean getAccessTokenAuthorizationAssertion(String assertion_type, String assertion) {
-        String body =
-            getAccessTokenCommonBody('assertion', service.Scope__c) + // scope間違い
-            '&assertion_type=' + EncodingUtil.urlEncode(assertion_type, 'UTF-8') +
-            '&assertion=' + EncodingUtil.urlEncode(assertion, 'UTF-8');
-        token = getAccessToken(body);
-        insert token;
-        return true;
-    }
+	/* Client Credentials Grant (none support) */
 
-    /* grant_type=refresh_token */
+    /* Refreshing an Access Token */
     public Boolean getAccessTokenRefreshToken() {
         if (token == null || token.Refresh_Token__c == null) {
             return false;
@@ -120,6 +124,9 @@ public class OAuth2 extends OAuth {
         OAuth2_Token__c t = getAccessToken(body);
         if (t.Access_Token__c != null) {
             token.Access_Token__c = t.Access_Token__c;
+        }
+        if (t.Token_Type__c != null) {
+            token.Token_Type__c = t.Token_Type__c;
         }
         if (t.Expires_In__c != null) {
             token.Expires_In__c = t.Expires_In__c;
@@ -173,6 +180,7 @@ public class OAuth2 extends OAuth {
             Owner__c = UserInfo.getUserId(),
             OAuth_Service__c = service.Id,
             Access_Token__c = parameters.get('access_token'),
+            Token_Type__c = parameters.get('token_type'),
             Expires_In__c = expires_in,
             Refresh_Token__c = parameters.get('refresh_token'),
             Scope__c = parameters.get('scope')
@@ -185,15 +193,13 @@ public class OAuth2 extends OAuth {
     }
 
     public override HttpResponse rest(HttpRequest req) {
-        if (token != null) {
-            req.setHeader('Authorization', 'OAuth ' + token.Access_Token__c);
-        }
+        setAuthrization(req);
         HttpResponse res = send(req);
         Integer status_code = res.getStatusCode();
         if (status_code / 100 == 4) {
             OAuth2Exception e = new OAuth2Exception(res); 
             if (/*e.error == 'expired_token' && */getAccessTokenRefreshToken()) {
-                req.setHeader('Authorization', 'OAuth ' + token.Access_Token__c);
+                setAuthrization(req);
                 res = send(req);
                 update token;
                 return res;
@@ -202,4 +208,19 @@ public class OAuth2 extends OAuth {
         }
         return res;
     }
+
+	private void setAuthrization(HttpRequest req) {
+		if (token == null || service.Authorization_Type__c == null) {
+			return;
+		}
+		if (service.Authorization_Type__c == 'Request Header (Authorization: Bearer)') {
+            req.setHeader('Authorization', 'Bearer ' + token.Access_Token__c);
+		} else if (service.Authorization_Type__c == 'Request Header (Authorization: OAuth)') {
+            req.setHeader('Authorization', 'OAuth ' + token.Access_Token__c);
+		} else if (service.Authorization_Type__c == 'URI Query Parameter') {
+        	PageReference end_point = new PageReference(req.getEndpoint());
+			end_point.getParameters().put('access_token', token.Access_Token__c);
+			req.setEndPoint(end_point.getUrl());
+		}
+	}
 }

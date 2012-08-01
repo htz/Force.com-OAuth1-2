@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customButtons>Authorizaion</customButtons>
+    <excludeButtons>Submit</excludeButtons>
     <layoutSections>
         <customLabel>false</customLabel>
         <detailHeading>false</detailHeading>
@@ -17,6 +19,10 @@
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>Consumer_Secret__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Authorization_Type__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

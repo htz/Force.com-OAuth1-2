@@ -46,6 +46,27 @@
         <type>Url</type>
     </fields>
     <fields>
+        <fullName>Authorization_Type__c</fullName>
+        <externalId>false</externalId>
+        <label>Authorization Type</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Request Header (Authorization: Bearer)</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Request Header (Authorization: OAuth)</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>URI Query Parameter</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Authorization_URL__c</fullName>
         <externalId>false</externalId>
         <label>Authorization URL</label>
@@ -136,6 +157,21 @@
         <description>OAuth 1.0 Service</description>
         <label>OAuth1</label>
         <picklistValues>
+            <picklist>Authorization_Type__c</picklist>
+            <values>
+                <fullName>Request Header %28Authorization%3A Bearer%29</fullName>
+                <default>true</default>
+            </values>
+            <values>
+                <fullName>Request Header %28Authorization%3A OAuth%29</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>URI Query Parameter</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>Response_Type__c</picklist>
             <values>
                 <fullName>code</fullName>
@@ -153,6 +189,21 @@
         <description>OAuth 2.0 Service</description>
         <label>OAuth2</label>
         <picklistValues>
+            <picklist>Authorization_Type__c</picklist>
+            <values>
+                <fullName>Request Header %28Authorization%3A Bearer%29</fullName>
+                <default>true</default>
+            </values>
+            <values>
+                <fullName>Request Header %28Authorization%3A OAuth%29</fullName>
+                <default>false</default>
+            </values>
+            <values>
+                <fullName>URI Query Parameter</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
             <picklist>Response_Type__c</picklist>
             <values>
                 <fullName>code</fullName>
@@ -166,4 +217,22 @@
     </recordTypes>
     <searchLayouts/>
     <sharingModel>ReadWrite</sharingModel>
+    <webLinks>
+        <fullName>Authorizaion</fullName>
+        <availability>online</availability>
+        <displayType>button</displayType>
+        <hasMenubar>false</hasMenubar>
+        <hasScrollbars>true</hasScrollbars>
+        <hasToolbar>false</hasToolbar>
+        <height>600</height>
+        <isResizable>true</isResizable>
+        <linkType>url</linkType>
+        <masterLabel>Authorizaion</masterLabel>
+        <openType>newWindow</openType>
+        <position>none</position>
+        <protected>false</protected>
+        <showsLocation>false</showsLocation>
+        <showsStatus>false</showsStatus>
+        <url>/apex/OAuthAuthorize?id={!OAuthService__c.Id}</url>
+    </webLinks>
 </CustomObject>

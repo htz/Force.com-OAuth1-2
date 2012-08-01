@@ -104,6 +104,15 @@
         <type>Text</type>
         <unique>false</unique>
     </fields>
+    <fields>
+        <fullName>Token_Type__c</fullName>
+        <externalId>false</externalId>
+        <label>Token Type</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
     <label>OAuth2 Token</label>
     <nameField>
         <displayFormat>OT2-{00000000}</displayFormat>
