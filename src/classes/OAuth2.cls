@@ -13,17 +13,17 @@ public class OAuth2 extends OAuth {
                     Name, Authorization_Type__c, Response_Type__c, Consumer_Key__c, Consumer_Secret__c,
                     Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c, Scope__c, State__c,
                     (
-                    	Select
-                    		Access_Token__c, Token_Type__c, Refresh_Token__c,
-                    		Expires_In__c, Expires_Date__c, Scope__c
-                    	From
-							OAuth2_Tokens__r
-						Where
-							Owner__c = :userId
-						Order By
-							CreatedDate DESC
-						Limit 1
-					)
+                        Select
+                            Access_Token__c, Token_Type__c, Refresh_Token__c,
+                            Expires_In__c, Expires_Date__c, Scope__c
+                        From
+                            OAuth2_Tokens__r
+                        Where
+                            Owner__c = :userId
+                        Order By
+                            CreatedDate DESC
+                        Limit 1
+                    )
                 From
                     OAuthService__c
                 WHERE
@@ -97,7 +97,7 @@ public class OAuth2 extends OAuth {
         return true;
     }
 
-	/* Implicit Grant */
+    /* Implicit Grant */
 
     /* Resource Owner Password Credentials Grant */
     public Boolean getAccessTokenAuthorizationPassword(String username, String password) {
@@ -111,7 +111,7 @@ public class OAuth2 extends OAuth {
         return true;
     }
 
-	/* Client Credentials Grant (none support) */
+    /* Client Credentials Grant (none support) */
 
     /* Refreshing an Access Token */
     public Boolean getAccessTokenRefreshToken() {
@@ -209,18 +209,18 @@ public class OAuth2 extends OAuth {
         return res;
     }
 
-	private void setAuthrization(HttpRequest req) {
-		if (token == null || service.Authorization_Type__c == null) {
-			return;
-		}
-		if (service.Authorization_Type__c == 'Request Header (Authorization: Bearer)') {
+    private void setAuthrization(HttpRequest req) {
+        if (token == null || service.Authorization_Type__c == null) {
+            return;
+        }
+        if (service.Authorization_Type__c == 'Request Header (Authorization: Bearer)') {
             req.setHeader('Authorization', 'Bearer ' + token.Access_Token__c);
-		} else if (service.Authorization_Type__c == 'Request Header (Authorization: OAuth)') {
+        } else if (service.Authorization_Type__c == 'Request Header (Authorization: OAuth)') {
             req.setHeader('Authorization', 'OAuth ' + token.Access_Token__c);
-		} else if (service.Authorization_Type__c == 'URI Query Parameter') {
-        	PageReference end_point = new PageReference(req.getEndpoint());
-			end_point.getParameters().put('access_token', token.Access_Token__c);
-			req.setEndPoint(end_point.getUrl());
-		}
-	}
+        } else if (service.Authorization_Type__c == 'URI Query Parameter') {
+            PageReference end_point = new PageReference(req.getEndpoint());
+            end_point.getParameters().put('access_token', token.Access_Token__c);
+            req.setEndPoint(end_point.getUrl());
+        }
+    }
 }
