@@ -1,6 +1,4 @@
 <apex:page controller="OAuthApiTestController">
-    <apex:outputText value="{!message}"/><br />
-    <br />
     <apex:form >
         <apex:outputPanel id="RequestComponents">
             <table>
@@ -20,32 +18,85 @@
                 <tr>
                     <th>Method:</th>
                     <td>
-                        <apex:selectList value="{!method}" size="1">
+                        <apex:selectList value="{!api.Method__c}" size="1">
                             <apex:selectOptions value="{!methodOptions}"/>
                         </apex:selectList>
-                    </td>
-                </tr>
-                <tr>
-                    <th>URL:</th>
-                    <td>
-                        <apex:inputText id="urlTextComp" value="{!url}" size="80"/>
-                        <apex:commandButton action="{!execute}" value="Send" disabled="{!service == null}" />
-                        <!-- apex:commandButton action="{!saveURL}" value="Save" rerender="savedURLsComp" disabled="{!service == null}" / -->
+                        <apex:inputText id="urlTextComp" value="{!api.Url__c}" size="80"/>
+                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" reRender="request_header,request_body,response_header,response_body,debug" />
                     </td>
                 </tr>
                 <tr>
                     <th>Body:</th>
                     <td>
-                        <apex:inputText value="{!postParam}" size="88"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Response:</th>
-                    <td>
-                        <apex:inputTextarea value="{!body}" rows="30" cols="100"/>
+                        <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" />
+                        Content-Type: <apex:inputText value="{!api.Content_Type__c}"/>
                     </td>
                 </tr>
             </table>
         </apex:outputPanel>
     </apex:form>
+    <!-- Result tab -->
+    <div class="tabBox">
+        <div label="Rquest Body">
+            <apex:outputText value="{!request_body}" id="request_body" />
+        </div>
+        <div label="Response Header">
+            <apex:outputPanel id="response_header">
+                {!response}<br />
+                <table>
+                    <apex:repeat value="{!response_headers}" var="key">
+                        <tr><th>{!key}:</th><td>{!response_headers[key]}</td></tr>
+                    </apex:repeat>
+                </table>
+            </apex:outputPanel>
+        </div>
+        <div label="Response Body">
+            <apex:outputText value="{!response_body}" id="response_body" />
+        </div>
+        <div label="Debug">
+            <apex:outputPanel style="none" id="debug">
+                <apex:repeat value="{!debugs}" var="d">
+                    {!d}<br />
+                </apex:repeat>
+            </apex:outputPanel>
+        </div>
+    </div>
+    <!-- Tab script -->
+    <apex:variable var="tab_color" value="#ccc" />
+    <apex:variable var="tab_text_color" value="#000" />
+    <apex:variable var="activetab_color" value="#BA3B3B" />
+    <apex:variable var="activetab_text_color" value="#fff" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        (function($) {
+            $(function() {
+                $('.tabBox').each(function(i, tab) {
+                    $(tab)
+                        .find('> div:first').before('<div class="tab"><ul></ul></div>').end()
+                        .find('> div:not(.tab)').each(function(i) {
+                            var id = 'tab' + i, label = $(this).attr('label');
+                            $(this).addClass('tabBody bPageBlock').attr('id', id);
+                            $(tab).find('.tab ul').append('<li id="' + id + '">' + label + '</li>');
+                            if (i == 0) $(tab).find('.tab #' + id).addClass('active');
+                            else $(this).hide();
+                        }).end()
+                        .find('.tab li').live('click', function() {
+                            var id = $(this).attr('id');
+                            $(tab).find('.tabBody').hide().filter('.tabBody#' + id).show();
+                            $(this)
+                                .siblings('.active').removeClass('active').attr('style', '').end()
+                                .addClass('active');
+                        });
+                });
+            });
+        })(jQuery.noConflict());
+    </script>
+    <!-- Tab style -->
+    <style type="text/css">
+        .tabBox .tab{margin:0;padding:0}
+        .tabBox .tab ul{list-style-type:none;margin-left:4px;padding:0}
+        .tabBox .tab ul li{float:left;height:16px;padding:4px 8px;margin:0 4px 0 0;background-color:{!tab_color};color:{!tab_text_color};-webkit-border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-o-border-radius:4px 4px 0 0;-ms-border-radius:4px 4px 0 0;-khtml-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0;font-weight:bold;cursor:pointer}
+        .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default}
+        .tabBox .tabBody{min-height:200px;padding:8px}
+    </style>
 </apex:page>
