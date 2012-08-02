@@ -110,7 +110,9 @@ public class OAuthApiTestController {
         req.setEndpoint(api.Url__c);
         if(api.Method__c == 'POST' || api.Method__c == 'PUT') {
             req.setBody(api.Body__c);
-            req.setHeader('Content-Type', api.Content_Type__c);
+            if (api.Content_Type__c != null) {
+                req.setHeader('Content-Type', api.Content_Type__c);
+            }
         }
         Id serviceId = service;
         try {

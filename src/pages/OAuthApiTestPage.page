@@ -1,6 +1,6 @@
 <apex:page controller="OAuthApiTestController">
     <apex:form >
-        <apex:outputPanel id="RequestComponents">
+        <apex:pageBlock mode="edit" id="RequestComponents">
             <table>
                 <tr>
                     <th>Service:</th>
@@ -9,7 +9,7 @@
                             <apex:selectOptions value="{!serviceOptions}"/>
                             <apex:actionSupport event="onchange" rerender="RequestComponents"/>
                         </apex:selectList>
-                        <apex:selectList size="1" id="savedURLsComp" value="{!serviceUrl}">
+                        <apex:selectList size="1" value="{!serviceUrl}" disabled="{!ISNULL(service)}">
                             <apex:selectOptions value="{!serviceUrlOptions}"/>
                             <apex:actionSupport event="onchange" action="{!loadURL}" rerender="RequestComponents"/>
                         </apex:selectList>
@@ -18,22 +18,22 @@
                 <tr>
                     <th>Method:</th>
                     <td>
-                        <apex:selectList value="{!api.Method__c}" size="1">
+                        <apex:selectList size="1" value="{!api.Method__c}" disabled="{!ISNULL(service)}">
                             <apex:selectOptions value="{!methodOptions}"/>
                         </apex:selectList>
-                        <apex:inputText id="urlTextComp" value="{!api.Url__c}" size="80"/>
+                        <apex:inputText size="80" value="{!api.Url__c}" disabled="{!ISNULL(service)}"/>
                         <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" reRender="request_header,request_body,response_header,response_body,debug" />
                     </td>
                 </tr>
                 <tr>
                     <th>Body:</th>
                     <td>
-                        <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" />
-                        Content-Type: <apex:inputText value="{!api.Content_Type__c}"/>
+                        <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" disabled="{!ISNULL(service)}" />
+                        Content-Type: <apex:inputText value="{!api.Content_Type__c}" disabled="{!ISNULL(service)}" />
                     </td>
                 </tr>
             </table>
-        </apex:outputPanel>
+        </apex:pageBlock>
     </apex:form>
     <!-- Result tab -->
     <div class="tabBox">

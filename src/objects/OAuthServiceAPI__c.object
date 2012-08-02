@@ -86,7 +86,7 @@
     </fields>
     <label>OAuth Service API</label>
     <nameField>
-        <label>Saved URL Name</label>
+        <label>API Name</label>
         <type>Text</type>
     </nameField>
     <pluralLabel>OAuth Service APIs</pluralLabel>
