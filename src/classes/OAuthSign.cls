@@ -148,7 +148,6 @@ public class OAuthSign {
 
     private String percentEncode(String str) {
         str = EncodingUtil.urlEncode(str, 'UTF-8');
-        str = str.replaceAll('%7e|%7E', '~');
-        return str;
+        return str.replaceAll('%7e|%7E', '~').replaceAll('\\+', '%20');
     }
 }
