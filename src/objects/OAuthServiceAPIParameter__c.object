@@ -34,63 +34,67 @@
     </actionOverrides>
     <deploymentStatus>Deployed</deploymentStatus>
     <enableActivities>false</enableActivities>
-    <enableEnhancedLookup>false</enableEnhancedLookup>
     <enableFeeds>false</enableFeeds>
     <enableHistory>false</enableHistory>
     <enableReports>false</enableReports>
     <fields>
-        <fullName>Body__c</fullName>
+        <fullName>OAuth_Service_API__c</fullName>
         <externalId>false</externalId>
-        <label>Body</label>
-        <length>32768</length>
-        <type>LongTextArea</type>
-        <visibleLines>10</visibleLines>
-    </fields>
-    <fields>
-        <fullName>Content_Type__c</fullName>
-        <externalId>false</externalId>
-        <label>Content Type</label>
-        <length>255</length>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>Method__c</fullName>
-        <externalId>false</externalId>
-        <label>Method</label>
-        <length>10</length>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>OAuth_Service__c</fullName>
-        <externalId>false</externalId>
-        <label>OAuth Service</label>
-        <referenceTo>OAuthService__c</referenceTo>
-        <relationshipLabel>OAuth Service APIs</relationshipLabel>
-        <relationshipName>OAuth_Service_APIs</relationshipName>
+        <label>OAuth Service API</label>
+        <referenceTo>OAuthServiceAPI__c</referenceTo>
+        <relationshipLabel>OAuth Service API Parameters</relationshipLabel>
+        <relationshipName>OAuth_Service_API_Parameters</relationshipName>
         <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <type>MasterDetail</type>
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
-        <fullName>Url__c</fullName>
-        <externalId>true</externalId>
-        <label>Url</label>
+        <fullName>Read_Only__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <label>Read Only</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Require__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <label>Require</label>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
+        <fullName>Type__c</fullName>
+        <externalId>false</externalId>
+        <label>Type</label>
+        <picklist>
+            <picklistValues>
+                <fullName>Query String</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Request Header</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>Value__c</fullName>
+        <externalId>false</externalId>
+        <label>Value</label>
         <length>255</length>
         <required>false</required>
         <type>Text</type>
         <unique>false</unique>
     </fields>
-    <label>OAuth Service API</label>
+    <label>OAuth Service API Parameter</label>
     <nameField>
-        <label>API Name</label>
+        <label>Parameter Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Service APIs</pluralLabel>
+    <pluralLabel>OAuth Service API Parameters</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
     <startsWith>Vowel</startsWith>

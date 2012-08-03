@@ -1,5 +1,12 @@
 public class OAuthApiTestController {
     public OAuthServiceAPI__c api { get; set; }
+    public String api_org_url { get; set; }
+    public List< OAuthServiceAPIParameter__c> parameters { get; set; }
+    public List< OAuthServiceAPIParameter__c> query_parameters { get; set; }
+    public List< OAuthServiceAPIParameter__c> header_parameters { get; set; }
+    public List<TemplateParameter> template { get; set; }
+    public Map<String, String> template_parameters { get; set; }
+    public String action_index { get; set; }
     public List<String> debugs { get; set; }
 
     public String request_body { get; set; }
@@ -9,6 +16,10 @@ public class OAuthApiTestController {
 
     public OAuthApiTestController() {
         api = new OAuthServiceAPI__c();
+        template = new List<TemplateParameter>();
+        query_parameters = new List<OAuthServiceAPIParameter__c>();
+        header_parameters = new List<OAuthServiceAPIParameter__c>();
+        template_parameters = new Map<String, String>();
         debugs = new List<String>();
     }
 
@@ -34,8 +45,8 @@ public class OAuthApiTestController {
                 services = new Map<Id, OAuthService__c>(); 
                 for(OAuthService__c o : [
                     Select
-                        Name, 
-                        (Select Name, Url__c, Body__c, Content_Type__c, Method__c From Saved_URLs__r) 
+                        Name,
+                        (Select Name, Url__c, Body__c, Content_Type__c, Method__c From OAuth_Service_APIs__r) 
                     From
                         OAuthService__c
                 ]) {
@@ -49,10 +60,12 @@ public class OAuthApiTestController {
     public String service { 
         get;
         set {
-            serviceUrls = null;
+            if (service == value) return;
+            serviceAPIs = null;
             if (value == '') value = null;
             service = value;
             api = new OAuthServiceAPI__c();
+            loadServiceAPI();
         }
     }
     public List<SelectOption> serviceOptions {
@@ -66,32 +79,32 @@ public class OAuthApiTestController {
         set;
     }
 
-    private Map<Id, OAuthServiceAPI__c> serviceUrls {
+    private Map<Id, OAuthServiceAPI__c> serviceAPIs {
         get {
-            if (serviceUrls == null) {
-                serviceUrls = new Map<Id, OAuthServiceAPI__c>();
-                if(service != null) {
-                    for(OAuthServiceAPI__c u : services.get(service).saved_urls__r) {
-                        serviceUrls.put(u.Id, u);
+            if (serviceAPIs == null) {
+                serviceAPIs = new Map<Id, OAuthServiceAPI__c>();
+                if(serviceAPIs != null) {
+                    for(OAuthServiceAPI__c u : services.get(service). OAuth_Service_APIs__r) {
+                        serviceAPIs.put(u.Id, u);
                     }
                 }
             }
-            return serviceUrls;
+            return serviceAPIs;
         }
         set;
     }
-    public String serviceUrl { 
+    public String serviceAPI { 
         get;
         set {
             if (value == '') value = null;
-            serviceUrl = value;
+            serviceAPI = value;
         }
     }
-    public List<SelectOption> serviceUrlOptions {
+    public List<SelectOption> serviceAPIOptions {
         get {
-            List<SelectOption> options = new List<SelectOption>{new SelectOption('', '')};
+            List<SelectOption> options = new List<SelectOption>{new SelectOption('', '<keyboard input>')};
             if(service != null) {
-                for(OAuthServiceAPI__c u : serviceUrls.values()) {
+                for(OAuthServiceAPI__c u : serviceAPIs.values()) {
                     options.add(new SelectOption(u.Id, u.Name));
                 }
             }
@@ -100,20 +113,65 @@ public class OAuthApiTestController {
     }
 
     public PageReference execute() {
+        Boolean check = true;
         if (api.Url__c == null || api.Url__c == '') {
             debug('Error: url = null');
             return null;
         }
-        debug('Method: ' + api.Method__c + ', Service: ' + service + ', URL: ' + api.Url__c);
+
+        // check template
+        for (TemplateParameter p : template) {
+            if (p.value == null || p.value == '') {
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Template: Required fields has not been inputted <Name = "' + p.key + '">'));
+                check = false;
+            }
+        }
+
+        // create endpoint
+        PageReference endpoint = new PageReference(api.Url__c);
+        for (OAuthServiceAPIParameter__c p : query_parameters) {
+            if (p.Name != null && p.Name != '') {
+                if ((p.Value__c == null || p.Value__c == '') && p.Require__c) {
+                    check = false;
+                    ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Query: Required fields has not been inputted <Name = "' + p.Name + '">'));
+                } else if (p.Value__c != null && p.Value__c != '') {
+                    endpoint.getParameters().put(p.Name, p.Value__c);
+                }
+            } else if (p.Value__c != null && p.Value__c != '') {
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Query: Value has been ignored <Value = "' + p.Value__c + '">'));
+                check = false;
+            }
+        }
+        String url = endpoint.getUrl();
+
+        // create request
+        debug('Method: ' + api.Method__c + ', Service: ' + service + ', URL: ' + url);
         HttpRequest req = new HttpRequest();
         req.setMethod(api.Method__c);
-        req.setEndpoint(api.Url__c);
+        req.setEndpoint(url);
         if(api.Method__c == 'POST' || api.Method__c == 'PUT') {
             req.setBody(api.Body__c);
             if (api.Content_Type__c != null) {
                 req.setHeader('Content-Type', api.Content_Type__c);
             }
         }
+
+        // set header
+        for (OAuthServiceAPIParameter__c p : header_parameters) {
+            if (p.Name != null && p.Name != '') {
+                if ((p.Value__c == null || p.Value__c == '') && p.Require__c) {
+                    check = false;
+                    ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Header: Required fields has not been inputted <Name = "' + p.Name + '">'));
+                } else if (p.Value__c != null && p.Value__c != '') {
+                    req.setHeader(p.Name, p.Value__c);
+                }
+            } else if (p.Value__c != null && p.Value__c != '') {
+                ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Header: Value has been ignored <Value = "' + p.Value__c + '">'));
+                check = false;
+            }
+        }
+
+        if (!check) return null;
         Id serviceId = service;
         try {
             OAuth oa = OAuth.newInstance(serviceId);
@@ -141,12 +199,110 @@ public class OAuthApiTestController {
         return headers;
     }
 
-    public PageReference loadURL() {
-        api = serviceUrls.get(serviceUrl);
+    public PageReference loadServiceAPI() {
+        debug('@loadServiceAPI');
+        api = serviceAPIs.get(serviceAPI);
+        query_parameters.clear();
+        header_parameters.clear();
+        template.clear();
+        if (api != null) {
+            parameters = [
+                Select
+                    Name, Value__c, Type__c, Require__c, Read_Only__c
+                From
+                    OAuthServiceAPIParameter__c
+                Where
+                    OAuth_Service_API__c = :api.Id
+                Order By
+                    Name
+            ];
+            for (OAuthServiceAPIParameter__c p : parameters) {
+                if (p.Type__c == 'Query String') query_parameters.add(p);
+                else if (p.Type__c == 'Request Header') header_parameters.add(p);
+            }
+
+            api_org_url = api.Url__c;
+            Pattern p = Pattern.compile('\\{([^\\}]+)\\}');
+            Matcher m = p.matcher(api.Url__c);
+            while(m.find()) {
+                TemplateParameter tp = new TemplateParameter();
+                tp.key = m.group(1);
+                tp.value = template_parameters.get(tp.key);
+                if (tp.value == null) {
+                    tp.value = '';
+                    template_parameters.put(tp.key, tp.value);
+                }
+                template.add(tp);
+            }
+            applyRequest();
+        } else {
+            api_org_url = null;
+        }
+
+        return null;
+    }
+
+    public PageReference applyRequest() {
+        debug('@applyRequest');
+        String url = api_org_url;
+        // template
+        for (TemplateParameter t : template) {
+            template_parameters.put(t.key, t.value);
+            if (t.value != null && t.value != '') {
+                url = url.replaceFirst('\\{' + Pattern.quote(t.key) + '\\}', t.value);
+                debug(t.key + ' => ' + t.value);
+            }
+        }
+        api.Url__c = url;
+        debug('url : ' + api.Url__c);
+
+        return null;
+    }
+
+    public PageReference add_query() {
+        debug('@add_query');
+        query_parameters.add(new OAuthServiceAPIParameter__c(Read_Only__c = false));
+        return null;
+    }
+
+    public PageReference delete_query() {
+        debug('@delete_query(' + action_index + ')');
+        if (action_index == null || action_index == '') return null;
+        Integer index = Integer.valueOf(action_index);
+        if (index >= 0 && index < query_parameters.size()) {
+            query_parameters.remove(index);
+        }
+        return null;
+    }
+
+    public PageReference add_header() {
+        debug('@add_header');
+        header_parameters.add(new OAuthServiceAPIParameter__c(Read_Only__c = false));
+        return null;
+    }
+
+    public PageReference delete_header() {
+        debug('@delete_header(' + action_index + ')');
+        if (action_index == null || action_index == '') return null;
+        Integer index = Integer.valueOf(action_index);
+        if (index >= 0 && index < header_parameters.size()) {
+            header_parameters.remove(index);
+        }
+        return null;
+    }
+
+    public PageReference clearDebug() {
+        debugs.clear();
         return null;
     }
 
     private void debug(String str) {
+        System.debug(str);
         debugs.add(str);
+    }
+
+    public class TemplateParameter {
+        public String key { get; set; }
+        public String value { get; set; }
     }
 }

@@ -1,40 +1,149 @@
 <apex:page controller="OAuthApiTestController">
-    <apex:form >
-        <apex:pageBlock mode="edit" id="RequestComponents">
+    <style>
+        .RequestForm input[type=text]:disabled,
+        .RequestForm textarea:disabled {
+            background-color: #eee;
+        }
+        .RequestForm .require {
+            color: red;
+            font-weight: bold;
+        }
+        .RequestForm .require:before {
+            content: "*";
+        }
+        .RequestForm .deleteImage {
+            width:16px;
+            height:16px;
+            background-repeat: no-repeat;
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAXUlEQVR42u2SwQoAIAhD88vVLy8KBlaS0i1oJwP3piGVg0Skmpq8HjqZrWl9uwCbGAmwKYGZs/6iqgMyAdJuM8W2QmYKpLt/0AG9ASCv/oAnANd3AEjmAlFT1BypAV+PnRH5YehvAAAAAElFTkSuQmCC);
+        }
+    </style>
+    <apex:form styleClass="RequestForm">
+        <apex:actionFunction action="{!delete_query}" name="delete_query" reRender="request_query,debug">
+            <apex:param assignTo="{!action_index}" name="selected_item" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction action="{!delete_header}" name="delete_header" reRender="request_header,debug">
+            <apex:param assignTo="{!action_index}" name="selected_item" value=""/>
+        </apex:actionFunction>
+        <apex:pageBlock mode="edit">
             <table>
                 <tr>
                     <th>Service:</th>
                     <td>
-                        <apex:selectList value="{!service}" size="1">
+                        <apex:selectList value="{!service}" size="1" id="service">
                             <apex:selectOptions value="{!serviceOptions}"/>
-                            <apex:actionSupport event="onchange" rerender="RequestComponents"/>
+                            <apex:actionSupport event="onchange" reRender="messages,api,request_method,request_url,send,request_query,add_query,request_template,request_header,add_header,request_body,request_content_type,debug"/>
                         </apex:selectList>
-                        <apex:selectList size="1" value="{!serviceUrl}" disabled="{!ISNULL(service)}">
-                            <apex:selectOptions value="{!serviceUrlOptions}"/>
-                            <apex:actionSupport event="onchange" action="{!loadURL}" rerender="RequestComponents"/>
+                        <apex:selectList size="1" value="{!serviceAPI}" disabled="{!ISNULL(service)}" id="api">
+                            <apex:selectOptions value="{!serviceAPIOptions}"/>
+                            <apex:actionSupport event="onchange" action="{!loadServiceAPI}" reRender="messages,request_method,request_url,send,request_query,request_template,request_header,request_body,request_content_type,debug"/>
                         </apex:selectList>
                     </td>
                 </tr>
                 <tr>
                     <th>Method:</th>
                     <td>
-                        <apex:selectList size="1" value="{!api.Method__c}" disabled="{!ISNULL(service)}">
+                        <apex:selectList size="1" value="{!api.Method__c}" disabled="{!ISNULL(service)}" id="request_method">
                             <apex:selectOptions value="{!methodOptions}"/>
                         </apex:selectList>
-                        <apex:inputText size="80" value="{!api.Url__c}" disabled="{!ISNULL(service)}"/>
-                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" reRender="request_header,request_body,response_header,response_body,debug" />
+                        <apex:inputText value="{!api.Url__c}" disabled="{!ISNULL(service) || !ISNULL(api_org_url)}" id="request_url" style="width: 600px" />
+                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" id="send" reRender="messages,request_body,response_header,response_body,debug" />
                     </td>
                 </tr>
                 <tr>
-                    <th>Body:</th>
-                    <td>
-                        <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" disabled="{!ISNULL(service)}" />
-                        Content-Type: <apex:inputText value="{!api.Content_Type__c}" disabled="{!ISNULL(service)}" />
+                    <td colspan="2">
+                        <div class="tabBox">
+                            <div label="Query">
+                                <apex:outputPanel id="request_query">
+                                    <table>
+                                        <apex:variable var="index" value="0" />
+                                        <apex:repeat value="{!query_parameters}" var="p">
+                                            <tr>
+                                                <th>
+                                                    <apex:outputPanel rendered="{!!ISBLANK(p.Id)}">
+                                                        {!p.Name}<apex:outputPanel rendered="{!p.Require__c}"><span class="require" /></apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                    <apex:inputText value="{!p.Name}" rendered="{!ISNULL(p.Id)}" />
+                                                </th>
+                                                <td>
+                                                    <apex:outputPanel rendered="{!!p.Read_Only__c}">
+                                                        &nbsp;:&nbsp;<apex:inputText value="{!p.Value__c}" style="width: 600px" />
+                                                        <apex:outputPanel rendered="{!ISNULL(p.Id)}">
+                                                            <a href="javascript:void(0)" onclick="delete_query({!index})">
+                                                                <img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="deleteImage" />
+                                                            </a>
+                                                        </apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                    <apex:outputPanel rendered="{!p.Read_Only__c}">
+                                                        &nbsp;:&nbsp;<input type="text" value="{!p.Value__c}" style="width: 600px" disabled="disabled" />
+                                                    </apex:outputPanel>
+                                                </td>
+                                            </tr>
+                                            <apex:variable var="index" value="{!VALUE(index) + 1}" />
+                                        </apex:repeat>
+                                    </table>
+                                </apex:outputPanel>
+                                <apex:commandButton id="add_query" action="{!add_query}" value="Add" disabled="{!ISNULL(service)}" reRender="messages,request_query,debug" />
+                            </div>
+                            <div label="Template">
+                                <apex:outputPanel id="request_template">
+                                    <table>
+                                        <apex:repeat value="{!template}" var="t">
+                                            <tr>
+                                                <th>{!t.key}<span class="require" /></th>
+                                                <td>
+                                                    &nbsp;:&nbsp;<apex:inputText value="{!t.value}" style="width: 600px">
+                                                        <apex:actionSupport event="onkeyup" action="{!applyRequest}" reRender="messages,request_url,debug" />
+                                                    </apex:inputText>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </apex:outputPanel>
+                            </div>
+                            <div label="Header">
+                                <apex:outputPanel id="request_header">
+                                    <table>
+                                        <apex:variable var="index" value="0" />
+                                        <apex:repeat value="{!header_parameters}" var="p">
+                                            <tr>
+                                                <th>
+                                                    <apex:outputPanel rendered="{!!ISBLANK(p.Id)}">
+                                                        {!p.Name}<apex:outputPanel rendered="{!p.Require__c}"><span class="require" /></apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                    <apex:inputText value="{!p.Name}" rendered="{!ISNULL(p.Id)}" />
+                                                </th>
+                                                <td>
+                                                    <apex:outputPanel rendered="{!!p.Read_Only__c}">
+                                                        &nbsp;:&nbsp;<apex:inputText value="{!p.Value__c}" style="width: 600px" />
+                                                        <apex:outputPanel rendered="{!ISNULL(p.Id)}">
+                                                            <a href="javascript:void(0)" onclick="delete_header({!index})">
+                                                                <img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="deleteImage" />
+                                                            </a>
+                                                        </apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                    <apex:outputPanel rendered="{!p.Read_Only__c}">
+                                                        <span>&nbsp;:&nbsp;</span><input type="text" value="{!p.Value__c}" style="width: 600px" disabled="disabled" />
+                                                    </apex:outputPanel>
+                                                </td>
+                                            </tr>
+                                            <apex:variable var="index" value="{!VALUE(index) + 1}" />
+                                        </apex:repeat>
+                                    </table>
+                                </apex:outputPanel>
+                                <apex:commandButton id="add_header" action="{!add_header}" value="Add" disabled="{!ISNULL(service)}" reRender="messages,request_header,debug" />
+                            </div>
+                            <div label="Body">
+                                <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" disabled="{!ISNULL(service)}"  id="request_body"/>
+                                Content-Type: <apex:inputText value="{!api.Content_Type__c}" disabled="{!ISNULL(service)}" id="request_content_type" />
+                            </div>
+                        </div>
                     </td>
                 </tr>
             </table>
         </apex:pageBlock>
     </apex:form>
+    <apex:pageMessages id="messages" />
     <!-- Result tab -->
     <div class="tabBox">
         <div label="Rquest Body">
@@ -54,7 +163,10 @@
             <apex:outputText value="{!response_body}" id="response_body" />
         </div>
         <div label="Debug">
-            <apex:outputPanel style="none" id="debug">
+            <apex:outputPanel id="debug">
+                <apex:form >
+                    <apex:commandButton action="{!clearDebug}" value="Clear" reRender="messages,debug" />
+                </apex:form>
                 <apex:repeat value="{!debugs}" var="d">
                     {!d}<br />
                 </apex:repeat>
@@ -97,6 +209,6 @@
         .tabBox .tab ul{list-style-type:none;margin-left:4px;padding:0}
         .tabBox .tab ul li{float:left;height:16px;padding:4px 8px;margin:0 4px 0 0;background-color:{!tab_color};color:{!tab_text_color};-webkit-border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-o-border-radius:4px 4px 0 0;-ms-border-radius:4px 4px 0 0;-khtml-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0;font-weight:bold;cursor:pointer}
         .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default}
-        .tabBox .tabBody{min-height:200px;padding:8px}
+        .tabBox .tabBody{min-height:100px;padding:8px}
     </style>
 </apex:page>
