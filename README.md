@@ -1,6 +1,6 @@
 # Apex OAuth 1.0/2.0 Consumer with Test Playground
 
-This project was copied over from <https://github.com/jesperfj/sfdc-oauth-playground>, since I do all my projects on github now. I don't expect to make any changes, so the two locations will likely stay in sync but this is now the main project home.
+This project was copied over from <https://github.com/jesperfj/sfdc-oauth-playground by Jesper Joergensen>, since I do all my projects on github now. I don't expect to make any changes, so the two locations will likely stay in sync but this is now the main project home.
 
 This project provides a basic Oauth 1.0/2.0 consumer implementation in Apex. It defines objects for storing keys and secrets for multiple services and users. It also comes with an API "playground" where you can try out API calls to your Oauth services.
 
@@ -38,7 +38,7 @@ Oauth 2.0
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-31
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-22
 
-# License
+# MIT License
 
 Copyright (c) 2012 Masashi Tsuji
 
