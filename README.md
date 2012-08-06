@@ -35,7 +35,7 @@ Oauth 2.0
 ## Sample Code
 
 # Reference RFC
-* http://tools.ietf.org/html/draft-ietf-oauth-v2-30
+* http://tools.ietf.org/html/draft-ietf-oauth-v2-31
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-22
 
 # License
