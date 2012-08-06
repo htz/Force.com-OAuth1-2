@@ -114,6 +114,15 @@ public virtual class OAuth {
     public virtual HttpResponse rest(HttpRequest req) {
         return null;
     }
+    public OAuthJSON json(HttpRequest req) {
+        HttpResponse res = rest(req);
+        String body = getResponseBody(res);
+        OAuthJSON json = null;
+        if (body != null && body != '') {
+            json = OAuthJSON.newInstance(body);
+        }
+        return json;
+    }
     public HttpResponse rest(String method, String url, String body) {
         HttpRequest req = new HttpRequest();
         req.setMethod(method);

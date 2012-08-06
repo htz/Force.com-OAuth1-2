@@ -64,7 +64,6 @@ public class OAuthApiTestController {
             serviceAPIs = null;
             if (value == '') value = null;
             service = value;
-            api = new OAuthServiceAPI__c();
             loadServiceAPI();
         }
     }
@@ -241,7 +240,11 @@ public class OAuthApiTestController {
             }
             applyRequest();
         } else {
+            api = new OAuthServiceAPI__c();
             api_org_url = null;
+        }
+        if (api.Content_Type__c == null || api.Content_Type__c == '') {
+            api.Content_Type__c  = 'application/x-www-form-urlencoded; charset=utf-8';
         }
 
         return null;

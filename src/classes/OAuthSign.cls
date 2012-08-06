@@ -92,8 +92,10 @@ public class OAuthSign {
     private String getSignatureBaseString(HttpRequest req) {
         Map<String, List<String>> org = this.parameters.clone();
 
-        if (req.getMethod().equalsIgnoreCase('POST') && req.getBody() != null &&
-            req.getHeader('Content-Type') == 'application/x-www-form-urlencoded') {
+        if (req.getMethod().equalsIgnoreCase('POST') && req.getBody() != null && (
+            req.getHeader('Content-Type').startsWith('application/x-www-form-urlencoded;') ||
+            req.getHeader('Content-Type') == 'application/x-www-form-urlencoded'
+        )) {
             put(splitParameters(req.getBody()));
         }
         String host = req.getEndpoint();

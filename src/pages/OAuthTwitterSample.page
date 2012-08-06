@@ -1,7 +1,73 @@
 <apex:page controller="OAuthTwitterSampleController" action="{!init}">
+    <style>
+        .tweet_form {
+            border: 1px solid #aaa;
+            border-radius: 8px;
+            width: 656px;
+            padding: 8px;
+        }
+        .tweet_form textarea {
+            width: 656px;
+        }
+        .tweet_form .submit {
+            text-align: right;
+        }
+        .feeds {
+            border: 1px solid #aaa;
+            border-bottom: none;
+            border-radius: 8px;
+            width: 672px;
+            margin-top: 10px;
+        }
+        .feeds .feed {
+            border-bottom: 1px solid #aaa;
+            width: 672px;
+        }
+        .feeds .feed:last-child {
+            border-radius: 8px;
+        }
+        .feeds .feed .image {
+            float: left;
+            padding: 8px;
+            width: 48px;
+        }
+        .feeds .feed .tweet {
+            float: left;
+            padding: 8px;
+            padding-left: 0;
+            width: 600px;
+        }
+        .feeds .clear {
+            clear: both;
+            height: 0;
+        }
+    </style>
     <apex:form >
-        <apex:commandButton value="Refresh" reRender="feed" />
-        <br />
-        <apex:inputTextarea readonly="true" value="{!feed}" id="feed" cols="100" rows="50" />        
+        <apex:outputPanel id="tweet_form" styleClass="tweet_form" layout="block">
+            <apex:inputTextarea value="{!status}">
+                <apex:actionSupport event="onkeyup" reRender="len" />
+            </apex:inputTextarea>
+            <div class="submit">
+                <apex:outputText value="{!LEN(status)}" id="len" />
+                <apex:commandButton action="{!post}" value="Tweet" reRender="tweet_form,feeds" />
+            </div>
+        </apex:outputPanel>
+        <apex:actionPoller interval="30" reRender="feeds" />
     </apex:form>
+    <apex:outputPanel id="feeds" styleClass="feeds" layout="block">
+        <apex:repeat value="{!feed.array_value}" var="f">
+            <div class="feed">
+                <div class="image">
+                    <apex:image value="{!f.hash_value['user'].hash_value['profile_image_url'].string_value}" />
+                </div>
+                <div class="tweet">
+                    <apex:outputLink value="https://twitter.com/{!f.hash_value['user'].hash_value['name'].string_value}">
+                        <apex:outputText value="{!f.hash_value['user'].hash_value['name'].string_value}" />
+                    </apex:outputLink>
+                    <p><apex:outputText value="{!f.hash_value['text'].string_value}" /></p>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </apex:repeat>
+    </apex:outputPanel>
 </apex:page>

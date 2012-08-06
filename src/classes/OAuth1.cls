@@ -157,6 +157,12 @@ public class OAuth1 extends OAuth {
     }
 
     public override HttpResponse rest(HttpRequest req) {
+        String method = req.getMethod();
+        if (method == 'POST' || method == 'PUT' || method == 'PATCH') {
+            if (req.getHeader('Content-Type') == null || req.getHeader('Content-Type') == '') {
+                req.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+            }
+        }
         return signSend(req);
     }
 }
