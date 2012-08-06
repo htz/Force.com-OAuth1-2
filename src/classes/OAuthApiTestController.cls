@@ -7,7 +7,7 @@ public class OAuthApiTestController {
     public List<TemplateParameter> template { get; set; }
     public Map<String, String> template_parameters { get; set; }
     public String action_index { get; set; }
-    public List<String> debugs { get; set; }
+    public List<DebugLog> debugs { get; set; }
 
     public String request_body { get; set; }
     public String response { get; set; }
@@ -20,7 +20,7 @@ public class OAuthApiTestController {
         query_parameters = new List<OAuthServiceAPIParameter__c>();
         header_parameters = new List<OAuthServiceAPIParameter__c>();
         template_parameters = new Map<String, String>();
-        debugs = new List<String>();
+        debugs = new List<DebugLog>();
     }
 
     public String method { get;set; }
@@ -113,12 +113,22 @@ public class OAuthApiTestController {
     }
 
     public PageReference execute() {
+        Id serviceId = service;
+        OAuth oa = OAuth.newInstance(serviceId);
+        if (oa == null) {
+            debug('Error: oa = null');
+        }
+        if (!oa.hasToken()) {
+            debug('no token');
+            return oa.authorization();
+        }
+
         Boolean check = true;
-        if (api.Url__c == null || api.Url__c == '') {
+        // check api
+        if (api == null || api.Url__c == null || api.Url__c == '') {
             debug('Error: url = null');
             return null;
         }
-
         // check template
         for (TemplateParameter p : template) {
             if (p.value == null || p.value == '') {
@@ -126,7 +136,6 @@ public class OAuthApiTestController {
                 check = false;
             }
         }
-
         // create endpoint
         PageReference endpoint = new PageReference(api.Url__c);
         for (OAuthServiceAPIParameter__c p : query_parameters) {
@@ -143,7 +152,6 @@ public class OAuthApiTestController {
             }
         }
         String url = endpoint.getUrl();
-
         // create request
         debug('Method: ' + api.Method__c + ', Service: ' + service + ', URL: ' + url);
         HttpRequest req = new HttpRequest();
@@ -155,7 +163,6 @@ public class OAuthApiTestController {
                 req.setHeader('Content-Type', api.Content_Type__c);
             }
         }
-
         // set header
         for (OAuthServiceAPIParameter__c p : header_parameters) {
             if (p.Name != null && p.Name != '') {
@@ -170,11 +177,9 @@ public class OAuthApiTestController {
                 check = false;
             }
         }
-
         if (!check) return null;
-        Id serviceId = service;
+
         try {
-            OAuth oa = OAuth.newInstance(serviceId);
             HttpResponse res = oa.rest(req);
             setResult(req, res);
         } catch (OAuthException e) {
@@ -298,11 +303,29 @@ public class OAuthApiTestController {
 
     private void debug(String str) {
         System.debug(str);
-        debugs.add(str);
+        String tmp = new OAuthException('').getStackTraceString().split(', ')[1];
+        Integer index = tmp.indexOf('Class.');
+        if (index >= 0) {
+            tmp = tmp.substring(index + 6);
+        }
+        List<String> class_line = tmp.split(': line ');
+        debugs.add(new DebugLog(class_line[0], class_line[1], str));
     }
 
     public class TemplateParameter {
         public String key { get; set; }
         public String value { get; set; }
+    }
+
+    public class DebugLog {
+        public String klass { get; set; }
+        public String line { get; set; }
+        public String message { get; set; }
+
+        public DebugLog(String klass, String line, String message) {
+            this.klass = klass;
+            this.line = line;
+            this.message = message;
+        }
     }
 }

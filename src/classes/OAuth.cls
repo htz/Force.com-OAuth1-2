@@ -17,11 +17,15 @@ public virtual class OAuth {
         Schema.DescribeSObjectResult d = Schema.SObjectType.OAuthService__c;
         Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
 
-        if (service.RecordTypeId == rti.get('OAuth1').getRecordTypeId()) {
-            oa = new OAuth1(service.Id);
-        } else if (service.RecordTypeId == rti.get('OAuth2').getRecordTypeId()) {
-            oa = new OAuth2(service.Id);
+        try {
+            if (service.RecordTypeId == rti.get('OAuth1').getRecordTypeId()) {
+                oa = new OAuth1(service.Id);
+            } else if (service.RecordTypeId == rti.get('OAuth2').getRecordTypeId()) {
+                oa = new OAuth2(service.Id);
+            }
+        } catch (OAuthException e) {
         }
+
         return oa;
     }
     public static OAuth newInstance(Id serviceId) {

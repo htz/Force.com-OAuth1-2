@@ -47,12 +47,28 @@
                             <apex:selectOptions value="{!methodOptions}"/>
                         </apex:selectList>
                         <apex:inputText value="{!api.Url__c}" disabled="{!ISNULL(service) || !ISNULL(api_org_url)}" id="request_url" style="width: 600px" />
-                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" id="send" reRender="messages,request_body,response_header,response_body,debug" />
+                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" id="send" reRender="messages,request_body,response_header,response_body,debug" oncomplete="selectTab('response_header')" />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
                         <div class="tabBox">
+                            <div label="Template">
+                                <apex:outputPanel id="request_template">
+                                    <table>
+                                        <apex:repeat value="{!template}" var="t">
+                                            <tr>
+                                                <th>{!t.key}<span class="require" /></th>
+                                                <td>
+                                                    &nbsp;:&nbsp;<apex:inputText value="{!t.value}" style="width: 600px">
+                                                        <apex:actionSupport event="onkeyup" action="{!applyRequest}" reRender="messages,request_url,debug" />
+                                                    </apex:inputText>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </table>
+                                </apex:outputPanel>
+                            </div>
                             <div label="Query">
                                 <apex:outputPanel id="request_query">
                                     <table>
@@ -84,22 +100,6 @@
                                     </table>
                                 </apex:outputPanel>
                                 <apex:commandButton id="add_query" action="{!add_query}" value="Add" disabled="{!ISNULL(service)}" reRender="messages,request_query,debug" />
-                            </div>
-                            <div label="Template">
-                                <apex:outputPanel id="request_template">
-                                    <table>
-                                        <apex:repeat value="{!template}" var="t">
-                                            <tr>
-                                                <th>{!t.key}<span class="require" /></th>
-                                                <td>
-                                                    &nbsp;:&nbsp;<apex:inputText value="{!t.value}" style="width: 600px">
-                                                        <apex:actionSupport event="onkeyup" action="{!applyRequest}" reRender="messages,request_url,debug" />
-                                                    </apex:inputText>
-                                                </td>
-                                            </tr>
-                                        </apex:repeat>
-                                    </table>
-                                </apex:outputPanel>
                             </div>
                             <div label="Header">
                                 <apex:outputPanel id="request_header">
@@ -149,7 +149,7 @@
         <div label="Rquest Body">
             <apex:outputText value="{!request_body}" id="request_body" />
         </div>
-        <div label="Response Header">
+        <div label="Response Header" id="response_header">
             <apex:outputPanel id="response_header">
                 {!response}<br />
                 <table>
@@ -167,9 +167,15 @@
                 <apex:form >
                     <apex:commandButton action="{!clearDebug}" value="Clear" reRender="messages,debug" />
                 </apex:form>
-                <apex:repeat value="{!debugs}" var="d">
-                    {!d}<br />
-                </apex:repeat>
+                <table>
+                    <apex:repeat value="{!debugs}" var="d">
+                        <tr>
+                            <th>{!d.klass}</th>
+                            <th>[{!d.line}]:&nbsp;</th>
+                            <td>{!d.message}</td>
+                        </tr>
+                    </apex:repeat>
+                </table>
             </apex:outputPanel>
         </div>
     </div>
@@ -180,14 +186,19 @@
     <apex:variable var="activetab_text_color" value="#fff" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript">
+        var selectTab;
         (function($) {
+            selectTab = function(id) {
+                jQuery('.tabBox .tab ul li#' + id).trigger('click');
+            };
             $(function() {
                 $('.tabBox').each(function(i, tab) {
                     $(tab)
                         .find('> div:first').before('<div class="tab"><ul></ul></div>').end()
                         .find('> div:not(.tab)').each(function(i) {
                             var id = 'tab' + i, label = $(this).attr('label');
-                            $(this).addClass('tabBody bPageBlock').attr('id', id);
+                            if ($(this).attr('id')) id = $(this).attr('id');
+                            $(this).addClass('tabBody bPageBlock').attr('id', id).removeAttr('label');
                             $(tab).find('.tab ul').append('<li id="' + id + '">' + label + '</li>');
                             if (i == 0) $(tab).find('.tab #' + id).addClass('active');
                             else $(this).hide();
@@ -208,7 +219,7 @@
         .tabBox .tab{margin:0;padding:0}
         .tabBox .tab ul{list-style-type:none;margin-left:4px;padding:0}
         .tabBox .tab ul li{float:left;height:16px;padding:4px 8px;margin:0 4px 0 0;background-color:{!tab_color};color:{!tab_text_color};-webkit-border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-o-border-radius:4px 4px 0 0;-ms-border-radius:4px 4px 0 0;-khtml-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0;font-weight:bold;cursor:pointer}
-        .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default}
+        .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default;-moz-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;-webkit-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px)}
         .tabBox .tabBody{min-height:100px;padding:8px}
     </style>
 </apex:page>
