@@ -179,7 +179,8 @@ public class OAuthApiTestController {
         if (!check) return null;
 
         try {
-            HttpResponse res = oa.rest(req);
+            HttpResponse res = null;
+            res = System.currentPageReference().getParameters().containsKey('@test') ? new HttpResponse() : oa.rest(req);
             setResult(req, res);
         } catch (OAuthException e) {
             setResult(req, e.response);            

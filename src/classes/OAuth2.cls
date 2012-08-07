@@ -1,12 +1,10 @@
-public class OAuth2 extends OAuth {
+public virtual class OAuth2 extends OAuth {
     private OAuth2_Token__c token;
 
     public OAuth2() {
     }
-    public OAuth2(Id serviceId) {
-        this(serviceId, UserInfo.getUserId());
-    }
     public OAuth2(Id serviceId, Id userId) {
+        this();
         try {
             service = [
                 Select
@@ -36,6 +34,9 @@ public class OAuth2 extends OAuth {
             throw new OAuth2Exception('no service');
         }
     }
+    public OAuth2(Id serviceId) {
+        this(serviceId, UserInfo.getUserId());
+    }
 
     public override PageReference authorization() {
         PageReference redirect = new PageReference(service.Authorization_URL__c);
@@ -54,7 +55,7 @@ public class OAuth2 extends OAuth {
     }
 
     public override Boolean isCompleteUrl() {
-        PageReference current = ApexPages.currentPage();
+        PageReference current = currentPage();
         if (super.isCompleteUrl() && current.getParameters().containsKey('code')) {
             return true;
         }
@@ -158,7 +159,7 @@ public class OAuth2 extends OAuth {
 
         Map<String,String> parameters;
         if (res_content_type != null && res_content_type.startsWith('application/json')) {
-            parameters = getJsonParameters(res_body);
+            parameters = parseJsonParameters(res_body);
         } else {
             parameters = splitParameters(res_body);
         }

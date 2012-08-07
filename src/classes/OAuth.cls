@@ -5,6 +5,7 @@ public virtual class OAuth {
     public OAuth() {}
 
     public OAuth(OAuthService__c service) {
+        this();
         this.service = service;
         if (service == null) {
             System.debug('Couldn\'t find Oauth Service');
@@ -42,15 +43,20 @@ public virtual class OAuth {
     }
 
     public virtual Boolean isCompleteUrl() {
-        PageReference current = ApexPages.currentPage();
+        PageReference current = currentPage();
         if (current != null) {
             String host = current.getHeaders().get('Host');
-            String url = 'https://' + host + current.getUrl();
-            if (url.startsWith(service.Redirect_URL__c)) {
+            String url_http = 'https://' + host + current.getUrl();
+            String url_https = 'https://' + host + current.getUrl();
+            if (url_http.startsWith(service.Redirect_URL__c) || url_https.startsWith(service.Redirect_URL__c)) {
                 return true;
             }
         }
         return false;
+    }
+
+    protected virtual PageReference currentPage() {
+        return ApexPages.currentPage();
     }
 
     public virtual Boolean complete(Map<String, String> parameters) {
@@ -60,7 +66,7 @@ public virtual class OAuth {
         return complete(ApexPages.currentPage().getParameters());
     }
 
-    protected Map<String, String> splitParameters(String value) {
+    public static Map<String, String> splitParameters(String value) {
         if (value == null || value == '') {
             return new Map<String, String>();
         }
@@ -68,7 +74,7 @@ public virtual class OAuth {
         return tmp.getParameters();
     }
 
-    protected Map<String, String> getJsonParameters(String value) {
+    public static Map<String, String> parseJsonParameters(String value) {
         Map<String, String> parameters = null;
         JSONParser parser = JSON.createParser(value);
         if (parser.nextToken() == JSONToken.START_OBJECT) {
@@ -99,7 +105,7 @@ public virtual class OAuth {
         }
         return parameters;
     }
-    private void passParser(JSONParser parser) {
+    private static void passParser(JSONParser parser) {
         while (parser.nextToken() != JSONToken.END_OBJECT && parser.getCurrentToken() != JSONToken.END_ARRAY) {
             if (parser.getCurrentToken() == JSONToken.START_OBJECT || parser.getCurrentToken() == JSONToken.START_ARRAY) {
                 passParser(parser);

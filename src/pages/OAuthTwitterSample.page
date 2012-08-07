@@ -61,7 +61,7 @@
                     <apex:image value="{!f.hash_value['user'].hash_value['profile_image_url'].string_value}" />
                 </div>
                 <div class="tweet">
-                    <apex:outputLink value="https://twitter.com/{!f.hash_value['user'].hash_value['name'].string_value}">
+                    <apex:outputLink value="https://twitter.com/{!f.hash_value['user'].hash_value['screen_name'].string_value}" target="_blank">
                         <apex:outputText value="{!f.hash_value['user'].hash_value['name'].string_value}" />
                     </apex:outputLink>
                     <p><apex:outputText value="{!f.hash_value['text'].string_value}" /></p>

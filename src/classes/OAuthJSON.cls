@@ -68,20 +68,26 @@ public class OAuthJSON {
     }
 
     public OAuthJSON add(OAuthJSON value) {
-        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException(this);
         array_value.add(value);
         return this;
     }
 
     public OAuthJSON get(Integer index) {
-        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException(this);
         return array_value.get(index);
+    }
+
+    public OAuthJSON remove(Integer index) {
+        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException(this);
+        return array_value.remove(index);
     }
 
     public OAuthJSON join() {
         return join('');
     }
     public OAuthJSON join(String sep) {
+        if (value_type != ValueType.ARRAY_VALUE) throw new OAuthJSONException(this);
         String str = '';
         Integer i = 0;
         for (; i < size() - 1; i++) {
@@ -100,34 +106,34 @@ public class OAuthJSON {
     }
 
     public OAuthJSON put(String key, OAuthJSON value) {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         hash_value.put(key, value);
         return this;
     }
 
     public OAuthJSON putAll(Map<String, OAuthJSON> value_map) {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         hash_value.putAll(value_map);
         return this;
     }
 
     public OAuthJSON get(String key) {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         return hash_value.get(key);
     }
 
     public OAuthJSON remove(String key) {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         return hash_value.remove(key);
     }
 
     public Set<String> keySet() {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         return hash_value.keySet();
     }
 
     public Boolean containsKey(String key) {
-        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException();
+        if (value_type != ValueType.HASH_VALUE) throw new OAuthJSONException(this);
         return hash_value.containsKey(key);        
     }
 
@@ -141,25 +147,25 @@ public class OAuthJSON {
             hash_value.clear();
             return this;
         }
-        throw new OAuthJSONException();
+        throw new OAuthJSONException(this);
     }
 
     public Integer size() {
         if (value_type == ValueType.ARRAY_VALUE) return array_value.size();
         if (value_type == ValueType.HASH_VALUE) return hash_value.size();
-        throw new OAuthJSONException();
+        throw new OAuthJSONException(this);
     }
 
     public Boolean isEmpty() {
         if (value_type == ValueType.ARRAY_VALUE) return array_value.isEmpty();
         if (value_type == ValueType.HASH_VALUE) return hash_value.isEmpty();
-        throw new OAuthJSONException();
+        throw new OAuthJSONException(this);
     }
 
     public List<OAuthJSON> values() {
         if (value_type == ValueType.ARRAY_VALUE) return array_value;
         if (value_type == ValueType.HASH_VALUE) return hash_value.values();
-        throw new OAuthJSONException();
+        throw new OAuthJSONException(this);
     }
 
     public String to_s() {
@@ -169,12 +175,14 @@ public class OAuthJSON {
             str = '';
         } else if (value_type == ValueType.INTEGER_VALUE) {
             str = String.valueOf(integer_value);
+        } else if (value_type == ValueType.DECIMAL_VALUE) {
+            str = String.valueOf(decimal_value);
         } else if (value_type == ValueType.DOUBLE_VALUE) {
             str = String.valueOf(double_value);
         } else if (value_type == ValueType.BOOLEAN_VALUE) {
             str = String.valueOf(boolean_value);
         } else if (value_type == ValueType.STRING_VALUE) {
-            str = String.escapeSingleQuotes(string_value);
+            str = string_value;
         } else if (value_type == ValueType.ARRAY_VALUE) {
             Integer i = 0;
             str = '';
@@ -194,14 +202,13 @@ public class OAuthJSON {
 
         if (value_type == ValueType.NULL_VALUE) {
             str = 'null';
-        } else if (value_type == ValueType.INTEGER_VALUE) {
-            str = String.valueOf(integer_value);
-        } else if (value_type == ValueType.DECIMAL_VALUE) {
-            str = String.valueOf(decimal_value);
-        } else if (value_type == ValueType.DOUBLE_VALUE) {
-            str = String.valueOf(double_value);
-        } else if (value_type == ValueType.BOOLEAN_VALUE) {
-            str = String.valueOf(boolean_value);
+        } else if (
+            value_type == ValueType.INTEGER_VALUE ||
+            value_type == ValueType.DECIMAL_VALUE ||
+            value_type == ValueType.DOUBLE_VALUE ||
+            value_type == ValueType.BOOLEAN_VALUE
+        ) {
+            str = to_s();
         } else if (value_type == ValueType.STRING_VALUE) {
             str = '"' + String.escapeSingleQuotes(string_value) + '"';
         } else if (value_type == ValueType.ARRAY_VALUE) {
@@ -233,8 +240,8 @@ public class OAuthJSON {
         return str;
     }
 
-    public static OAuthJSON newInstance(String script) {
-        return newInstance(JSON.createParser(script));
+    public static OAuthJSON newInstance(String value) {
+        return newInstance(JSON.createParser(value));
     }
 
     public static OAuthJSON newInstance(JSONParser parser) {

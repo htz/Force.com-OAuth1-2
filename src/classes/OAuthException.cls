@@ -5,4 +5,8 @@ public virtual class OAuthException extends Exception {
         this(message);
         this.response = response;
     }
+
+    protected virtual String getWWWAuthenticateHeader() {
+        return this.response.getHeader('WWW-Authenticate');
+    }
 }

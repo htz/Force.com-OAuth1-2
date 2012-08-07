@@ -1,12 +1,10 @@
-public class OAuth1 extends OAuth {
+public virtual class OAuth1 extends OAuth {
     private OAuth_Token__c token;
 
     public OAuth1() {
     }
-    public OAuth1(Id serviceId) {
-        this(serviceId, UserInfo.getUserId());
-    }
     public OAuth1(Id serviceId, Id userId) {
+        this();
         try {
             service = [
                 Select
@@ -26,6 +24,9 @@ public class OAuth1 extends OAuth {
         } catch (Exception e) {
             throw new OAuth1Exception('no service');
         }
+    }
+    public OAuth1(Id serviceId) {
+        this(serviceId, UserInfo.getUserId());
     }
 
     public static OAuth1 newInstanceByToken(String token) {
@@ -74,7 +75,7 @@ public class OAuth1 extends OAuth {
     }
 
     public override Boolean isCompleteUrl() {
-        PageReference current = ApexPages.currentPage();
+        PageReference current = currentPage();
         if (super.isCompleteUrl() && current.getParameters().containsKey('oauth_token')) {
             return true;
         }
@@ -143,6 +144,12 @@ public class OAuth1 extends OAuth {
         return signSend(req, null);
     }
     public HttpResponse signSend(HttpRequest req, Map<String, String> parameters) {
+        String method = req.getMethod();
+        if (method == 'POST' || method == 'PUT' || method == 'PATCH') {
+            if (req.getHeader('Content-Type') == null || req.getHeader('Content-Type') == '') {
+                req.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+            }
+        }
         Map<String, String> sign_parameters = getSignParameters();
         OAuthSign sign = new OAuthSign(sign_parameters);
         sign.put(parameters);
@@ -157,12 +164,6 @@ public class OAuth1 extends OAuth {
     }
 
     public override HttpResponse rest(HttpRequest req) {
-        String method = req.getMethod();
-        if (method == 'POST' || method == 'PUT' || method == 'PATCH') {
-            if (req.getHeader('Content-Type') == null || req.getHeader('Content-Type') == '') {
-                req.setHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
-            }
-        }
         return signSend(req);
     }
 }

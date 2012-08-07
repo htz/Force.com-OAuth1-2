@@ -6,11 +6,12 @@ public with sharing class OAuthAuthorizeController {
     }
 
     public PageReference init() {
+        PageReference redirect = new PageReference('/' + service.Id);
         try {
             OAuth oa = OAuth.newInstance(service);
-            return oa.authorization();
+            redirect = oa.authorization();
         } catch (OAuthException e) {
-            return new PageReference('/' + service.Id);
         }
+        return redirect;
     }
 }

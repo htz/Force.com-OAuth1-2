@@ -1,4 +1,4 @@
-public class OAuth1Exception extends OAuthException {
+public virtual class OAuth1Exception extends OAuthException {
     public String oauth_problem { get; set; }
 
     public OAuth1Exception(String oauth_problem, String message, HttpResponse response) {
@@ -10,12 +10,12 @@ public class OAuth1Exception extends OAuthException {
         this(oauth_problem, message, null);
     }
     public OAuth1Exception(HttpResponse response) {
-        super(null, response);
+        this(null, null, response);
     }
 
     private void setWwwAuthenticate() {
         if (this.response != null) {
-            String header = this.response.getHeader('WWW-Authenticate');
+            String header = getWWWAuthenticateHeader();
             System.debug('WWW-Authenticate = ' + header);
             if (header != null) {
                 String oauth_problem = header.replaceAll('.*oauth_problem="([^"]*)".*', '$1');

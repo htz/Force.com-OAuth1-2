@@ -135,7 +135,7 @@
                             </div>
                             <div label="Body">
                                 <apex:inputTextarea value="{!api.Body__c}" rows="10" style="width: 100%;" disabled="{!ISNULL(service)}"  id="request_body"/>
-                                Content-Type: <apex:inputText value="{!api.Content_Type__c}" disabled="{!ISNULL(service)}" id="request_content_type" />
+                                Content-Type: <apex:inputText value="{!api.Content_Type__c}" style="width: 400px;" disabled="{!ISNULL(service)}" id="request_content_type" />
                             </div>
                         </div>
                     </td>

@@ -7,29 +7,35 @@ public class OAuthTwitterSampleController {
     }
 
     public PageReference init() {
-        PageReference p = null;
+        PageReference p = Page.OAuthTwitterSample;
+        p.setRedirect(true);
         if (oa.isCompleteUrl()) {
             oa.complete();
-            p = Page.OAuthTwitterSample;
-            p.setRedirect(true);
         } else if (!oa.hasToken()) {
             p = oa.authorization();
+        } else {
+            p = null;
         }
         return p;
     }
 
     public OAuthJSON getFeed() {
+        OAuthJSON json = null;
         try {
-            HttpResponse res = oa.get('https://api.twitter.com/1/statuses/home_timeline.json');
-            String body = res.getBody();
-            OAuthJSON json = null;
+            HttpResponse res = null;
+            String body = null;
+            if (!System.currentPageReference().getParameters().containsKey('@test')) {
+                res = oa.get('https://api.twitter.com/1/statuses/home_timeline.json');
+                body = res.getBody();
+            } else {
+                body = '[]';
+            }
             if (body != null && body != '') {
                 json = OAuthJSON.newInstance(body);
             }
-            return json;
         } catch (OAuthException e) {
-            return null;
         }
+        return json;
     }
 
     public PageReference post() {
@@ -39,7 +45,9 @@ public class OAuthTwitterSampleController {
         req.setMethod('POST');
         req.setBody('status=' + EncodingUtil.urlEncode(status, 'UTF-8'));
         try {
-            HttpResponse res = oa.rest(req);
+            if (!System.currentPageReference().getParameters().containsKey('@test')) {
+                oa.rest(req);
+            }
             status = '';
         } catch (OAuthException e) {
         }

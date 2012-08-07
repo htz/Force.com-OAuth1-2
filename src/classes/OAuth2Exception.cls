@@ -1,4 +1,4 @@
-public class OAuth2Exception extends OAuthException {
+public virtual class OAuth2Exception extends OAuthException {
     public String error { get; set; }
     public String error_uri { get; set; }
     public String scope { get; set; }
@@ -25,16 +25,21 @@ public class OAuth2Exception extends OAuthException {
         );
     }
     public OAuth2Exception(Map<String, String> parameters) {
-        this(parameters, null);
+        this(
+            parameters.get('error'),
+            parameters.get('error_description'),
+            parameters.get('error_uir'),
+            parameters.get('scope'),
+            parameters.get('state')
+        );
     }
-
     public OAuth2Exception(HttpResponse response) {
         this(new Map<String, String>(), response);
     }
 
     private void setWwwAuthenticate() {
         if (this.response != null) {
-            String header = this.response.getHeader('WWW-Authenticate');
+            String header = getWWWAuthenticateHeader();
             System.debug('WWW-Authenticate = ' + header);
             if (header != null) {
                 String error = header.replaceAll('.*error="([^"]*)".*', '$1');
