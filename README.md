@@ -4,6 +4,8 @@ This project was copied over from &quot;https://github.com/jesperfj/sfdc-oauth-p
 
 This project provides a basic Oauth 1.0/2.0 consumer implementation in Apex. It defines objects for storing keys and secrets for multiple services and users. It also comes with an API "playground" where you can try out API calls to your Oauth services.
 
+Install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001CTCj
+
 # About this project
 
 The main purpose of this project is to show how to write OAuth signed requests in Apex, but it expanded beyond that to a more full fledged OAuth consumer playground. It comes with a set of custom objects for storing OAuth service configuration and OAuth tokens on behalf of users in the org.
@@ -38,7 +40,8 @@ Oauth 2.0
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-31
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-22
 
-# MIT License
+# License
+*MIT License*
 
 Copyright (c) 2012 Masashi Tsuji
 
