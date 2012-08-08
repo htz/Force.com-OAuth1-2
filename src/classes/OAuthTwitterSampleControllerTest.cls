@@ -16,8 +16,6 @@ private class OAuthTwitterSampleControllerTest {
             Authorization_Type__c = 'Request Header (Authorization: Bearer)'
         );
         insert s;
-        s.State__c = s.Id;
-        update s;
         return s;
     }
 

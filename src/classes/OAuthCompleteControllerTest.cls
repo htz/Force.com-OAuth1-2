@@ -1,5 +1,5 @@
 @isTest
-private class OAuthAuthorizeTestControllerTest {
+private class OAuthCompleteControllerTest {
     public static OAuthService__c createTestService1() {
         Schema.DescribeSObjectResult d = Schema.SObjectType.OAuthService__c;
         Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
@@ -47,25 +47,24 @@ private class OAuthAuthorizeTestControllerTest {
             Authorization_Type__c = 'Request Header (Authorization: Bearer)'
         );
         insert s;
-        s.State__c = s.Id;
-        update s;
         return s;
     }
 
     public static testMethod void testAll() {
         Map<String, String> parameters = ApexPages.currentPage().getParameters();
-        OAuthAuthorizeTestController t = new OAuthAuthorizeTestController();
+        OAuthCompleteController t = new OAuthCompleteController();
         parameters.put('@test', 'test');
 
         OAuthService__c s1 = createTestService1();
         OAuth_Token__c t1 = createToken1(s1);
-        t.completeAuthorization();
+        t.complete();
         parameters.put('oauth_token', t1.OAuth_Token__c);
-        t.completeAuthorization();
+        t.complete();
+        parameters.remove('oauth_token');
 
         OAuthService__c s2 = createTestService2();
-        t.completeAuthorization2();
+        t.complete();
         parameters.put('state', s2.Id);
-        t.completeAuthorization2();
+        t.complete();
     }
 }

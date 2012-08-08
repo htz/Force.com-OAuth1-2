@@ -9,7 +9,7 @@ public virtual class OAuth2 extends OAuth {
             service = [
                 Select
                     Name, Authorization_Type__c, Response_Type__c, Consumer_Key__c, Consumer_Secret__c,
-                    Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c, Scope__c, State__c,
+                    Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c, Scope__c,
                     (
                         Select
                             Access_Token__c, Token_Type__c, Refresh_Token__c,
@@ -39,6 +39,7 @@ public virtual class OAuth2 extends OAuth {
     }
 
     public override PageReference authorization() {
+        PageReference current = currentPage();
         PageReference redirect = new PageReference(service.Authorization_URL__c);
         redirect.getParameters().put('response_type', service.Response_Type__c);
         redirect.getParameters().put('client_id', service.Consumer_Key__c);
@@ -48,8 +49,8 @@ public virtual class OAuth2 extends OAuth {
         if (service.Scope__c != null) {
             redirect.getParameters().put('scope', service.Scope__c);
         }
-        if (service.State__c != null) {
-            redirect.getParameters().put('state', service.State__c);
+        if (current.getParameters().containsKey('state')) {
+            redirect.getParameters().put('state', current.getParameters().get('state'));
         }
         return redirect;
     }

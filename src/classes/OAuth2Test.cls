@@ -16,8 +16,6 @@ private class OAuth2Test {
             Authorization_Type__c = 'Request Header (Authorization: Bearer)'
         );
         insert s;
-        s.State__c = s.Id;
-        update s;
         return s;
     }
 
@@ -57,6 +55,7 @@ private class OAuth2Test {
         // success
         PageReference complete_page = new PageReference('/oauth/done?code=code');
         complete_page.getHeaders().put('Host', 'localhost');
+        complete_page.getParameters().put('state', s1.Id);
         OAuth2 o1 = new OAuth2Tester(s1, complete_page);
         o1.authorization();
         System.assert(o1.isCompleteUrl());
