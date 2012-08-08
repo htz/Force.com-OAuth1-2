@@ -1,5 +1,5 @@
 <apex:page controller="OAuthTwitterSampleController" action="{!init}">
-    <style>
+    <style type="text/css">
         .tweet_form {
             border: 1px solid #aaa;
             border-radius: 8px;
@@ -7,7 +7,10 @@
             padding: 8px;
         }
         .tweet_form textarea {
-            width: 656px;
+            width: 650px;
+            margin: 0;
+            padding: 2px;
+            border-size: 1px;
         }
         .tweet_form .submit {
             text-align: right;
@@ -26,7 +29,7 @@
         .feeds .feed:last-child {
             border-radius: 8px;
         }
-        .feeds .feed .image {
+        .feeds .feed .photo {
             float: left;
             padding: 8px;
             width: 48px;
@@ -57,14 +60,14 @@
     <apex:outputPanel id="feeds" styleClass="feeds" layout="block">
         <apex:repeat value="{!feed.array_value}" var="f">
             <div class="feed">
-                <div class="image">
+                <div class="photo">
                     <apex:image value="{!f.hash_value['user'].hash_value['profile_image_url'].string_value}" />
                 </div>
                 <div class="tweet">
                     <apex:outputLink value="https://twitter.com/{!f.hash_value['user'].hash_value['screen_name'].string_value}" target="_blank">
-                        <apex:outputText value="{!f.hash_value['user'].hash_value['name'].string_value}" />
+                        {!f.hash_value['user'].hash_value['name'].string_value}
                     </apex:outputLink>
-                    <p><apex:outputText value="{!f.hash_value['text'].string_value}" /></p>
+                    <p>{!f.hash_value['text'].string_value}</p>
                 </div>
                 <div class="clear"></div>
             </div>
