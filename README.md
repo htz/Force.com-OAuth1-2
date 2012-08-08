@@ -4,7 +4,11 @@ This project was copied over from &quot;https://github.com/jesperfj/sfdc-oauth-p
 
 This project provides a basic Oauth 1.0/2.0 consumer implementation in Apex. It defines objects for storing keys and secrets for multiple services and users. It also comes with an API "playground" where you can try out API calls to your Oauth services.
 
-Install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001CTCj
+# Package
+* Package Name: OAuth Development Kit
+* Version: 1.1
+* Last Update: 2012/08/08 14:32
+* Install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001CTCo
 
 # About this project
 
