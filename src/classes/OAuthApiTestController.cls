@@ -14,6 +14,8 @@ public class OAuthApiTestController {
     public Map<String, String> response_headers { get; set; }
     public String response_body { get; set; }
 
+    private Pattern p = Pattern.compile('\\{([^\\}]+)\\}');
+
     public OAuthApiTestController() {
         api = new OAuthServiceAPI__c();
         template = new List<TemplateParameter>();
@@ -29,9 +31,14 @@ public class OAuthApiTestController {
             if(methodOptions == null) {
                 methodOptions = new List<SelectOption>{
                     new SelectOption('GET', 'GET'),
+                    //new SelectOption('HEAD', 'HEAD'),
                     new SelectOption('POST', 'POST'),
                     new SelectOption('PUT', 'PUT'),
-                    new SelectOption('DELETE', 'DELETE')
+                    new SelectOption('DELETE', 'DELETE'),
+                    //new SelectOption('OPTIONS', 'OPTIONS'),
+                    new SelectOption('TRACE', 'TRACE'),
+                    //new SelectOption('CONNECT', 'CONNECT'),
+                    new SelectOption('PATCH', 'PATCH')
                 };
             }
             return methodOptions;
@@ -46,9 +53,12 @@ public class OAuthApiTestController {
                 for(OAuthService__c o : [
                     Select
                         Name,
-                        (Select Name, Url__c, Body__c, Content_Type__c, Method__c From OAuth_Service_APIs__r) 
+                        (Select Name, Url__c, Body__c, Content_Type__c, Method__c From OAuth_Service_APIs__r Order By Name),
+                        (Select Name, Value__c From OAuth_Service_Variable__r)
                     From
                         OAuthService__c
+                    Order By
+                        Name
                 ]) {
                     services.put(o.Id, o);
                 }
@@ -83,6 +93,7 @@ public class OAuthApiTestController {
             if (serviceAPIs == null) {
                 serviceAPIs = new Map<Id, OAuthServiceAPI__c>();
                 if(serviceAPIs != null) {
+                    Id serviceId = service;
                     for(OAuthServiceAPI__c u : services.get(service). OAuth_Service_APIs__r) {
                         serviceAPIs.put(u.Id, u);
                     }
@@ -103,7 +114,8 @@ public class OAuthApiTestController {
         get {
             List<SelectOption> options = new List<SelectOption>{new SelectOption('', '<keyboard input>')};
             if(service != null) {
-                for(OAuthServiceAPI__c u : serviceAPIs.values()) {
+                Id serviceId = service;
+                for(OAuthServiceAPI__c u : services.get(serviceId).OAuth_Service_APIs__r) {
                     options.add(new SelectOption(u.Id, u.Name));
                 }
             }
@@ -206,6 +218,7 @@ public class OAuthApiTestController {
 
     public PageReference loadServiceAPI() {
         debug('@loadServiceAPI');
+        Id serviceId = service;
         api = serviceAPIs.get(serviceAPI);
         query_parameters.clear();
         header_parameters.clear();
@@ -219,6 +232,7 @@ public class OAuthApiTestController {
                 Where
                     OAuth_Service_API__c = :api.Id
                 Order By
+                    Require__c DESC,
                     Name
             ];
             for (OAuthServiceAPIParameter__c p : parameters) {
@@ -226,9 +240,12 @@ public class OAuthApiTestController {
                 else if (p.Type__c == 'Request Header') header_parameters.add(p);
             }
 
-            api_org_url = api.Url__c;
-            Pattern p = Pattern.compile('\\{([^\\}]+)\\}');
-            Matcher m = p.matcher(api.Url__c);
+            String url = api.Url__c;
+            for (OAuthServiceVariable__c v : services.get(serviceId).OAuth_Service_Variable__r) {
+                url = url.replaceFirst('\\{' + Pattern.quote(v.Name) + '\\}', v.Value__c);
+            }
+            api_org_url = url;
+            Matcher m = p.matcher(url);
             while(m.find()) {
                 TemplateParameter tp = new TemplateParameter();
                 tp.key = m.group(1);

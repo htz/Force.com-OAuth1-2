@@ -95,6 +95,11 @@
         <fields>isAccess__c</fields>
         <relatedList>OAuth_Token__c.OAuth_Service__c</relatedList>
     </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>Value__c</fields>
+        <relatedList>OAuthServiceVariable__c.OAuth_Service__c</relatedList>
+    </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
     <showInteractionLogPanel>false</showInteractionLogPanel>

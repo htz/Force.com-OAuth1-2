@@ -122,5 +122,4 @@
     <pluralLabel>OAuth2 Tokens</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
-    <startsWith>Vowel</startsWith>
 </CustomObject>

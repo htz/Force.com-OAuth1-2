@@ -62,6 +62,7 @@
                                                 <td>
                                                     &nbsp;:&nbsp;<apex:inputText value="{!t.value}" style="width: 600px">
                                                         <apex:actionSupport event="onkeyup" action="{!applyRequest}" reRender="messages,request_url,debug" />
+                                                        <apex:actionSupport event="onchange" action="{!applyRequest}" reRender="messages,request_url,debug" />
                                                     </apex:inputText>
                                                 </td>
                                             </tr>

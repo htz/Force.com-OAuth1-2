@@ -42,55 +42,28 @@
         <externalId>false</externalId>
         <label>OAuth Service</label>
         <referenceTo>OAuthService__c</referenceTo>
-        <relationshipLabel>OAuth Tokens</relationshipLabel>
-        <relationshipName>OAuth_Tokens</relationshipName>
+        <relationshipLabel>OAuth Service Variable</relationshipLabel>
+        <relationshipName>OAuth_Service_Variable</relationshipName>
         <relationshipOrder>0</relationshipOrder>
         <reparentableMasterDetail>false</reparentableMasterDetail>
         <type>MasterDetail</type>
         <writeRequiresMasterRead>false</writeRequiresMasterRead>
     </fields>
     <fields>
-        <fullName>OAuth_Token_Secret__c</fullName>
+        <fullName>Value__c</fullName>
         <externalId>false</externalId>
-        <label>OAuth Token Secret</label>
+        <label>Value</label>
         <length>255</length>
         <required>false</required>
         <type>Text</type>
         <unique>false</unique>
     </fields>
-    <fields>
-        <fullName>OAuth_Token__c</fullName>
-        <externalId>false</externalId>
-        <label>OAuth Token</label>
-        <length>255</length>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
-        <fullName>Owner__c</fullName>
-        <deleteConstraint>SetNull</deleteConstraint>
-        <externalId>false</externalId>
-        <label>Owner</label>
-        <referenceTo>User</referenceTo>
-        <relationshipName>OAuth_Tokens</relationshipName>
-        <required>false</required>
-        <type>Lookup</type>
-    </fields>
-    <fields>
-        <fullName>isAccess__c</fullName>
-        <defaultValue>false</defaultValue>
-        <externalId>false</externalId>
-        <label>isAccess</label>
-        <type>Checkbox</type>
-    </fields>
-    <label>OAuth Token</label>
+    <label>OAuth Service Variable</label>
     <nameField>
-        <displayFormat>OT-{00000000}</displayFormat>
-        <label>OAuth Token No</label>
-        <type>AutoNumber</type>
+        <label>Variable Name</label>
+        <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Tokens</pluralLabel>
+    <pluralLabel>OAuth Service Variable</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
 </CustomObject>

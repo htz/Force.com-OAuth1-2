@@ -93,5 +93,4 @@
     <pluralLabel>OAuth Service APIs</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
-    <startsWith>Vowel</startsWith>
 </CustomObject>

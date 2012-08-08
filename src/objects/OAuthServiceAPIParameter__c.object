@@ -97,5 +97,4 @@
     <pluralLabel>OAuth Service API Parameters</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
-    <startsWith>Vowel</startsWith>
 </CustomObject>
