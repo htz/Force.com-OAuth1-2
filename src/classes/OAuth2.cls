@@ -38,8 +38,7 @@ public virtual class OAuth2 extends OAuth {
         this(serviceId, UserInfo.getUserId());
     }
 
-    public override PageReference authorization() {
-        PageReference current = currentPage();
+    public override PageReference authorization(Map<String, String> parameters) {
         PageReference redirect = new PageReference(service.Authorization_URL__c);
         redirect.getParameters().put('response_type', service.Response_Type__c);
         redirect.getParameters().put('client_id', service.Consumer_Key__c);
@@ -49,8 +48,8 @@ public virtual class OAuth2 extends OAuth {
         if (service.Scope__c != null) {
             redirect.getParameters().put('scope', service.Scope__c);
         }
-        if (current.getParameters().containsKey('state')) {
-            redirect.getParameters().put('state', current.getParameters().get('state'));
+        if (parameters.containsKey('state')) {
+            redirect.getParameters().put('state', parameters.get('state'));
         }
         return redirect;
     }

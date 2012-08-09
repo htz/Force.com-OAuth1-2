@@ -38,8 +38,11 @@ public virtual class OAuth {
         return newInstance(service);
     }
 
-    public virtual PageReference authorization() {
+    public virtual PageReference authorization(Map<String, String> parameters) {
         return null;
+    }
+    public PageReference authorization() {
+        return authorization(System.currentPageReference().getParameters());
     }
 
     public virtual Boolean isCompleteUrl() {

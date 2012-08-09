@@ -40,7 +40,7 @@ public virtual class OAuth1 extends OAuth {
         }
     }
 
-    public override PageReference authorization() {
+    public override PageReference authorization(Map<String, String> parameters) {
         token = null;
         HttpRequest req = new HttpRequest();
         req.setMethod('POST');
