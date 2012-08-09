@@ -148,7 +148,7 @@
         <fullName>OAuth1</fullName>
         <active>true</active>
         <description>OAuth 1.0 Service</description>
-        <label>OAuth1</label>
+        <label>OAuth 1.0</label>
         <picklistValues>
             <picklist>Authorization_Type__c</picklist>
             <values>
@@ -180,7 +180,7 @@
         <fullName>OAuth2</fullName>
         <active>true</active>
         <description>OAuth 2.0 Service</description>
-        <label>OAuth2</label>
+        <label>OAuth 2.0</label>
         <picklistValues>
             <picklist>Authorization_Type__c</picklist>
             <values>

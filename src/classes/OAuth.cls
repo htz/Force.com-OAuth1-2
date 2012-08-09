@@ -19,9 +19,9 @@ public virtual class OAuth {
         Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
 
         try {
-            if (service.RecordTypeId == rti.get('OAuth1').getRecordTypeId()) {
+            if (service.RecordTypeId == rti.get('OAuth 1.0').getRecordTypeId()) {
                 oa = new OAuth1(service.Id);
-            } else if (service.RecordTypeId == rti.get('OAuth2').getRecordTypeId()) {
+            } else if (service.RecordTypeId == rti.get('OAuth 2.0').getRecordTypeId()) {
                 oa = new OAuth2(service.Id);
             }
         } catch (OAuthException e) {

@@ -11,7 +11,7 @@ private class OAuthCompleteControllerTest {
             Authorization_URL__c = 'https://test/oauth/auth',
             Redirect_URL__c = 'https://localhost/oauth/done',
             OwnerId = UserInfo.getUserId(),
-            RecordTypeId = rti.get('OAuth1').getRecordTypeId(),
+            RecordTypeId = rti.get('OAuth 1.0').getRecordTypeId(),
             Request_Token_Url__c = 'https://test/oauth/request_token',
             Authorization_Type__c = 'Request Header (Authorization: OAuth)'
         );
@@ -42,7 +42,7 @@ private class OAuthCompleteControllerTest {
             Authorization_URL__c = 'https://test/oauth/auth',
             Redirect_URL__c = 'https://localhost/oauth/done',
             OwnerId = UserInfo.getUserId(),
-            RecordTypeId = rti.get('OAuth2').getRecordTypeId(),
+            RecordTypeId = rti.get('OAuth 2.0').getRecordTypeId(),
             Scope__c = 'full',
             Authorization_Type__c = 'Request Header (Authorization: Bearer)'
         );
