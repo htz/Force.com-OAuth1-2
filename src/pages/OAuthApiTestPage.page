@@ -1,4 +1,220 @@
 <apex:page controller="OAuthApiTestController">
+    <!-- tab settings { -->
+    <apex:variable var="tab_color" value="#ccc" />
+    <apex:variable var="tab_text_color" value="#000" />
+    <apex:variable var="activetab_color" value="#BA3B3B" />
+    <apex:variable var="activetab_text_color" value="#fff" />
+    <!-- tab settings } -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js"></script>
+    <script src="{!URLFOR($Resource.OAuthTesterLibs, 'lib/jquery.cookie.js')}" type="text/javascript"></script>
+    <script src="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.treeview.js')}" type="text/javascript"></script>
+    <script type="text/javascript">
+        var refresh = function () {};
+
+        (function ($) {
+            // jQuery plugin wrapper
+            $.fn.attrs = function() {
+                return attrs(this[0]);
+            };
+            // return a map of the element attributes
+            function attrs(e) {
+                var a = e.attributes, // attributes object shorcut
+                    l = a.length, // object length
+                    map = {}, // map object
+                    i = 0, // for the loop
+                    v; // hold current node value in the loop
+                // loop through attributes and build our map
+                for (;i < l; i++) {
+                    v = a[i].nodeValue;
+                    if (v) map[a[i].nodeName] = v;
+                };
+                // for contentEditable we check that it is really set due to IE
+                if (map.contentEditable) {
+                    var div = document.createElement('<div />').appendChild(e);
+                    if (!(div.innerHTML.toLowerCase().indexOf('contenteditable') !== -1)) {
+                        delete map.contentEditable;
+                    };
+                };
+                // return the map object
+                return map;
+            };
+
+            refresh = function () {
+                var response_type = $('#response_type').val();
+                $('.tabBox .tab ul li#response_header').trigger('click');
+                if (response_type == 'json') {
+                    updateJsonTree('#response_json');
+                } else if (response_type == 'xml') {
+                    updateXmlTree('#response_xml');
+                }
+            }
+
+            var tmpl_fn_options = {
+                format: function (str) {
+                    var urlPattern = new RegExp('((?:http|ftp|https)://[a-z0-9\-_]+(?:\.[a-z0-9\-_]+)+(?:[a-z0-9\-\.,@\?^=%&;:/~\+#]*[a-z0-9\-@\?^=%&;/~\+#])?)', 'ig');
+                    return $.encode($.trim(str)).replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
+                },
+                trim: function (str) {
+                    return $.trim(str);
+                }
+            };
+
+            function updateJsonTree(expr) {
+                var json_input = $(expr);
+                var json = $.parseJSON(json_input.val());
+                var json_tree = $('#jsonTreeTemplate').tmpl({json: json}, {fn: tmpl_fn_options}).insertAfter(json_input);
+                json_input.remove();
+                json_tree.treeview({
+                    collapsed: true,
+                    animated: "medium",
+                    control:"#sidetreecontrol",
+                    persist: "location"
+                });
+            }
+
+            function updateXmlTree(expr) {
+                var xml_input = $(expr);
+                var xmldoc = $.parseXML(xml_input.val());
+                var xml = $(xmldoc);
+                var xml_tree = $('#xmlTreeTemplate').tmpl({xml: xmldoc}, {fn: tmpl_fn_options}).insertAfter(xml_input);
+                //xml_input.remove();
+                xml_tree.treeview({
+                    collapsed: true,
+                    animated: "medium",
+                    control:"#sidetreecontrol",
+                    persist: "location"
+                });
+            }
+
+            $(function () {
+                $('.tabBox').each(function (i, tab) {
+                    $(tab)
+                        .find('> div:first').before('<div class="tab"><ul></ul></div>').end()
+                        .find('> div:not(.tab)').each(function(i) {
+                            var id = 'tab' + i, label = $(this).attr('label');
+                            if ($(this).attr('id')) id = $(this).attr('id');
+                            $(this).addClass('tabBody bPageBlock').attr('id', id).removeAttr('label');
+                            $(tab).find('.tab ul').append('<li id="' + id + '">' + label + '</li>');
+                            if (i == 0) $(tab).find('.tab #' + id).addClass('active');
+                            else $(this).hide();
+                        }).end()
+                        .find('.tab li').live('click', function() {
+                            var id = $(this).attr('id');
+                            $(tab).find('.tabBody').hide().filter('.tabBody#' + id).show();
+                            $(this)
+                                .siblings('.active').removeClass('active').attr('style', '').end()
+                                .addClass('active');
+                        });
+                });
+            });
+        })(jQuery);
+    </script>
+    <!-- JSON tree template -->
+    <script id="jsonTreeTemplate" type="text/x-jquery-tmpl">
+        <ul id="json_tree" class="json">
+            <li>
+                {{tmpl({json: json, root: true}, {fn: $item.fn}) "#jsonTreeValueTemplate"}}
+            </li>
+        </ul>
+    </script>
+    <script id="jsonTreeValueTemplate" type="text/x-jquery-tmpl">
+        {{if !root}}
+            :&nbsp;
+        {{/if}}
+        {{if json != null && typeof json == 'object'}}
+            {{if json instanceof Array}}
+                [{{tmpl($data, {fn: $item.fn}) "#jsonTreeArrayUlTemplate"}}]
+            {{else}}
+                {{{tmpl($data, {fn: $item.fn}) "#jsonTreeHashUlTemplate"}}}
+            {{/if}}
+        {{else typeof json == 'string'}}
+            <span class="jsonstring">&quot;{{html $item.fn.format(json)}}&quot;</span>
+        {{else}}
+            <span class="jsonvalue">${json}</span>
+        {{/if}}
+    </script>
+    <script id="jsonTreeArrayUlTemplate" type="text/x-jquery-tmpl">
+        <ul>
+            {{each json}}
+                <li>
+                    <span>[${$index}]</span>
+                    {{tmpl({json: $value, root: false}, {fn: $item.fn}) "#jsonTreeValueTemplate"}}
+                </li>
+            {{/each}}
+        </ul>
+    </script>
+    <script id="jsonTreeHashUlTemplate" type="text/x-jquery-tmpl">
+        <ul>
+            {{each json}}
+                <li>
+                    <span>&quot;${$index}&quot;</span>
+                    {{tmpl({json: $value, root: false}, {fn: $item.fn}) "#jsonTreeValueTemplate"}}
+                </li>
+            {{/each}}
+        </ul>
+    </script>
+    <!-- XML tree template -->
+    <script id="xmlTreeTemplate" type="text/x-jquery-tmpl">
+        <ul id="xml_tree" class="xmldoc">
+            {{if xml.xmlVersion || xml.xmlEncoding}}
+                <li><span class="elementnode">&lt;?xml{{if xml.xmlVersion}} version =<span class="attribute">&quot;${xml.xmlVersion}&quot;</span>{{/if}}{{if xml.xmlEncoding}} encoding=<span class="attribute">&quot;${xml.xmlEncoding}&quot;{{/if}}</span>?&gt;</span></li>
+            {{/if}}
+            {{if xml.doctype}}
+                <li><span class="doctype">${xml.doctype}</span></li>
+            {{/if}}
+            {{each xml.childNodes}}
+                {{tmpl({xml: $value}, {fn: $item.fn}) "#xmlTreeNodeTemplate"}}
+            {{/each}}
+        </ul>
+    </script>
+    <script id="xmlTreeNodeTemplate" type="text/x-jquery-tmpl">
+        {{if xml.nodeType == 3}}
+            {{if $item.fn.trim(xml.nodeValue) != ''}}
+                <li><span class="textnode">{{html $item.fn.format(xml.nodeValue)}}</span></li>
+            {{/if}}
+        {{else xml.nodeType == 1}}
+            <li>
+                {{if xml.childNodes.length > 0}}
+                    {{if xml.childNodes.length == 1 && xml.childNodes[0].nodeType == 3}}
+                        {{wrap "#xmlTreeElementTemplate"}}<span class="textnode">{{html $item.fn.format(xml.childNodes[0].nodeValue)}}</span>{{/wrap}}
+                    {{else}}
+                        {{wrap "#xmlTreeElementTemplate"}}
+                            <ul>
+                                {{each xml.childNodes}}
+                                    {{tmpl({xml: $value}, {fn: $item.fn}) "#xmlTreeNodeTemplate"}}
+                                {{/each}}
+                            </ul>
+                        {{/wrap}}
+                    {{/if}}
+                {{else}}
+                    {{wrap "#xmlTreeElementTemplate"}}{{/wrap}}
+                {{/if}}
+            </li>
+        {{else xml.nodeType == 8}}
+            <li><span class="commentnode">&lt;!-- ${xml.nodeValue} --&gt;</span></li>
+        {{else xml.nodeType == 4}}
+            <li>
+                <span class="cdatanode">&lt;!</span><li class="attribute">[CDATA[</span>
+                <ul>
+                    <li class="attribute"><span>${xml.nodeValue}</span>
+                </ul>
+                <li class="attribute">]]</span><span class="cdatanode">&gt;</span>
+            </li>
+        {{else}}
+            <li>&lt;!-- nodeType=&quot;${xml.nodeType}&quot;, nodeValue=&quot;${xml.nodeValue}&quot; --&gt;</li>
+        {{/if}}
+    </script>
+    <script id="xmlTreeElementTemplate" type="text/x-jquery-tmpl">
+        {{tmpl "#xmlTreeElementOpenTemplate"}}{{html $item.html()}}{{tmpl "#xmlTreeElementCloseTemplate"}}
+    </script>
+    <script id="xmlTreeElementOpenTemplate" type="text/x-jquery-tmpl">
+        <span class="elementnode">&lt;${xml.nodeName}{{each xml.attributes}} ${$value.nodeName}=<span class="attribute">&quot;${$value.nodeValue}&quot;</span>{{/each}}&gt;</span>
+    </script>
+    <script id="xmlTreeElementCloseTemplate" type="text/x-jquery-tmpl">
+        <span class="elementnode">&lt;/${xml.nodeName}&gt;</span>
+    </script>
+    <link rel="stylesheet" href="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.treeview.css')}" />
     <style>
         .RequestForm input[type=text]:disabled,
         .RequestForm textarea:disabled {
@@ -16,6 +232,43 @@
             height:16px;
             background-repeat: no-repeat;
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAXUlEQVR42u2SwQoAIAhD88vVLy8KBlaS0i1oJwP3piGVg0Skmpq8HjqZrWl9uwCbGAmwKYGZs/6iqgMyAdJuM8W2QmYKpLt/0AG9ASCv/oAnANd3AEjmAlFT1BypAV+PnRH5YehvAAAAAElFTkSuQmCC);
+        }
+        /* tab style */
+        .tabBox .tab{margin:0;padding:0}
+        .tabBox .tab ul{list-style-type:none;margin-left:4px;padding:0}
+        .tabBox .tab ul li{float:left;height:16px;padding:4px 8px;margin:0 4px 0 0;background-color:{!tab_color};color:{!tab_text_color};-webkit-border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-o-border-radius:4px 4px 0 0;-ms-border-radius:4px 4px 0 0;-khtml-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0;font-weight:bold;cursor:pointer}
+        .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default;-moz-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;-webkit-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px)}
+        .tabBox .tabBody{min-height:100px;padding:8px}
+        /* common tree style */
+        .treeview ul {
+            background-color: transparent;
+        }
+        /* json tree style */
+        .json .jsonvalue {
+            color: blue;
+        }
+        .json .jsonstring {
+            color: lightgreen;
+        }
+        /* xml tree style */
+        .xmldoc .doctype {
+            color: lightgray;
+        }
+        .xmldoc .textnode {
+            color: black;
+            font-weight: bold;
+        }
+        .xmldoc .elementnode {
+            color: blue;
+        }
+        .xmldoc .commentnode {
+            color: lightgreen;
+        }
+        .xmldoc .cdatanode {
+            color: blue;
+        }
+        .xmldoc .attribute {
+            color: red;
         }
     </style>
     <apex:form styleClass="RequestForm">
@@ -47,7 +300,7 @@
                             <apex:selectOptions value="{!methodOptions}"/>
                         </apex:selectList>
                         <apex:inputText value="{!api.Url__c}" disabled="{!ISNULL(service) || !ISNULL(api_org_url)}" id="request_url" style="width: 600px" />
-                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" id="send" reRender="messages,request_body,response_header,response_body,debug" oncomplete="selectTab('response_header')" />
+                        <apex:commandButton action="{!execute}" value="Send" disabled="{!ISNULL(service)}" id="send" reRender="messages,request_body,response_header,response_body,debug" oncomplete="refresh();" />
                     </td>
                 </tr>
                 <tr>
@@ -161,7 +414,16 @@
             </apex:outputPanel>
         </div>
         <div label="Response Body">
-            <apex:outputText value="{!response_body}" id="response_body" />
+            <apex:outputPanel id="response_body">
+                <input type="hidden" id="response_type" value="{!response_type}" />
+                <apex:outputText value="{!response_body}" rendered="{!response_type = 'plain'}" />
+                <apex:outputPanel rendered="{!response_type = 'json'}">
+                    <input type="hidden" id="response_json" value="{!response_body}" />
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!response_type = 'xml'}">
+                    <input type="hidden" id="response_xml" value="{!response_body}" />
+                </apex:outputPanel>
+            </apex:outputPanel>
         </div>
         <div label="Debug">
             <apex:outputPanel id="debug">
@@ -180,47 +442,4 @@
             </apex:outputPanel>
         </div>
     </div>
-    <!-- Tab script -->
-    <apex:variable var="tab_color" value="#ccc" />
-    <apex:variable var="tab_text_color" value="#000" />
-    <apex:variable var="activetab_color" value="#BA3B3B" />
-    <apex:variable var="activetab_text_color" value="#fff" />
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript">
-        var selectTab;
-        (function($) {
-            selectTab = function(id) {
-                jQuery('.tabBox .tab ul li#' + id).trigger('click');
-            };
-            $(function() {
-                $('.tabBox').each(function(i, tab) {
-                    $(tab)
-                        .find('> div:first').before('<div class="tab"><ul></ul></div>').end()
-                        .find('> div:not(.tab)').each(function(i) {
-                            var id = 'tab' + i, label = $(this).attr('label');
-                            if ($(this).attr('id')) id = $(this).attr('id');
-                            $(this).addClass('tabBody bPageBlock').attr('id', id).removeAttr('label');
-                            $(tab).find('.tab ul').append('<li id="' + id + '">' + label + '</li>');
-                            if (i == 0) $(tab).find('.tab #' + id).addClass('active');
-                            else $(this).hide();
-                        }).end()
-                        .find('.tab li').live('click', function() {
-                            var id = $(this).attr('id');
-                            $(tab).find('.tabBody').hide().filter('.tabBody#' + id).show();
-                            $(this)
-                                .siblings('.active').removeClass('active').attr('style', '').end()
-                                .addClass('active');
-                        });
-                });
-            });
-        })(jQuery.noConflict());
-    </script>
-    <!-- Tab style -->
-    <style type="text/css">
-        .tabBox .tab{margin:0;padding:0}
-        .tabBox .tab ul{list-style-type:none;margin-left:4px;padding:0}
-        .tabBox .tab ul li{float:left;height:16px;padding:4px 8px;margin:0 4px 0 0;background-color:{!tab_color};color:{!tab_text_color};-webkit-border-radius:4px 4px 0 0;-moz-border-radius:4px 4px 0 0;-o-border-radius:4px 4px 0 0;-ms-border-radius:4px 4px 0 0;-khtml-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0;font-weight:bold;cursor:pointer}
-        .tabBox .tab ul li.active{background-color:{!activetab_color};color:{!activetab_text_color};cursor:default;-moz-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;-webkit-box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;box-shadow: 3px 0 5px -3px #999,-3px 0 5px -3px #999;background-image: -moz-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px);background-image: -ms-linear-gradient(rgba(255, 255, 255, 0.50),rgba(255, 255, 255, 0) 12px)}
-        .tabBox .tabBody{min-height:100px;padding:8px}
-    </style>
 </apex:page>

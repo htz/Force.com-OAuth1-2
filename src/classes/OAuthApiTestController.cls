@@ -11,6 +11,7 @@ public class OAuthApiTestController {
 
     public String request_body { get; set; }
     public String response { get; set; }
+    public String response_type { get; set; }
     public Map<String, String> response_headers { get; set; }
     public String response_body { get; set; }
 
@@ -23,6 +24,7 @@ public class OAuthApiTestController {
         header_parameters = new List<OAuthServiceAPIParameter__c>();
         template_parameters = new Map<String, String>();
         debugs = new List<DebugLog>();
+        response_type = '';
     }
 
     public String method { get;set; }
@@ -205,6 +207,15 @@ public class OAuthApiTestController {
             response = 'HTTP/1.1 ' + res.getStatusCode() + ' ' + res.getStatus();
             response_headers = getResponseHeaders(res);
             response_body = res.getBody();
+            String type = res.getHeader('Content-Type');
+            response_type = 'plain';
+            if (type != null) {
+                if (type.startsWith('application/json')) {
+                    response_type = 'json';
+                } else if (type.startsWith('application/xml')) {
+                    response_type ='xml';
+                }
+            }
     }
 
     private Map<String, String> getResponseHeaders(HttpResponse res) {
