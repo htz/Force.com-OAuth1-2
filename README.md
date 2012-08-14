@@ -1,16 +1,18 @@
 # Apex OAuth 1.0/2.0 Consumer with Test Playground
 
-This project was copied over from &quot;https://github.com/jesperfj/sfdc-oauth-playground by Jesper Joergensen&quot;, since I do all my projects on github now. I don't expect to make any changes, so the two locations will likely stay in sync but this is now the main project home.
+## Introduction
+This project was copied over from &quot;<https://github.com/jesperfj/sfdc-oauth-playground> by Jesper Joergensen&quot;, since I do all my projects on github now. I don't expect to make any changes, so the two locations will likely stay in sync but this is now the main project home.
 
 This project provides a basic Oauth 1.0/2.0 consumer implementation in Apex. It defines objects for storing keys and secrets for multiple services and users. It also comes with an API "playground" where you can try out API calls to your Oauth services.
 
-# Package
+## Package
 * Package Name: OAuth Development Kit
-* Version: 1.2
-* Last Update: 2012/08/08 19:06
-* Install URL: https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001CTpB
+* Version: 1.3
+* Last Update: 2012/08/14 15:04
+* Install URL: [Install](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001CTpG)
+* Commit: [cacbe05f5dd8fd287415dd8ce38a99a62081b4ac](https://github.com/htz/Force.com-OAuth1-2/commit/cacbe05f5dd8fd287415dd8ce38a99a62081b4ac)
 
-# About this project
+## About this project
 
 The main purpose of this project is to show how to write OAuth signed requests in Apex, but it expanded beyond that to a more full fledged OAuth consumer playground. It comes with a set of custom objects for storing OAuth service configuration and OAuth tokens on behalf of users in the org.
 
@@ -22,30 +24,30 @@ Finally, the project includes an API Tester that you can use to make API request
 
 The code has been tested with the following services:
 
-Outh 1.0
+**Outh 1.0**
 * LinkedIn
 * Twitter
 * TripIt
 * Dropbox
 * Hatena
 
-Oauth 2.0
+**Oauth 2.0**
 * Salesforce
 * Facebook
 * Google
 * foursquare
 * GitHub
 
-## Apex Classes
+### Apex Classes
 
-## Sample Code
+### Sample Code
 
-# Reference RFC
+## Reference RFC
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-31
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-bearer-22
 
-# License
-*MIT License*
+## License
+**MIT License**
 
 Copyright (c) 2012 Masashi Tsuji
 
