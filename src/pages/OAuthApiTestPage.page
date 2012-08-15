@@ -1,10 +1,10 @@
 <apex:page controller="OAuthApiTestController">
-    <!-- tab settings { -->
+    <!-- tab settings start -->
     <apex:variable var="tab_color" value="#ccc" />
     <apex:variable var="tab_text_color" value="#000" />
     <apex:variable var="activetab_color" value="#BA3B3B" />
     <apex:variable var="activetab_text_color" value="#fff" />
-    <!-- tab settings } -->
+    <!-- tab settings end -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript" src="https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js"></script>
     <script src="{!URLFOR($Resource.OAuthTesterLibs, 'lib/jquery.cookie.js')}" type="text/javascript"></script>
@@ -13,41 +13,9 @@
         var refresh = function () {};
 
         (function ($) {
-            // jQuery plugin wrapper
-            $.fn.attrs = function() {
-                return attrs(this[0]);
-            };
-            // return a map of the element attributes
-            function attrs(e) {
-                var a = e.attributes, // attributes object shorcut
-                    l = a.length, // object length
-                    map = {}, // map object
-                    i = 0, // for the loop
-                    v; // hold current node value in the loop
-                // loop through attributes and build our map
-                for (;i < l; i++) {
-                    v = a[i].nodeValue;
-                    if (v) map[a[i].nodeName] = v;
-                };
-                // for contentEditable we check that it is really set due to IE
-                if (map.contentEditable) {
-                    var div = document.createElement('<div />').appendChild(e);
-                    if (!(div.innerHTML.toLowerCase().indexOf('contenteditable') !== -1)) {
-                        delete map.contentEditable;
-                    };
-                };
-                // return the map object
-                return map;
-            };
-
             refresh = function () {
-                var response_type = $('#response_type').val();
                 $('.tabBox .tab ul li#response_header').trigger('click');
-                if (response_type == 'json') {
-                    updateJsonTree('#response_json');
-                } else if (response_type == 'xml') {
-                    updateXmlTree('#response_xml');
-                }
+                updateTree('#response_body', $('#response_type').val());
             }
 
             var tmpl_fn_options = {
@@ -60,29 +28,22 @@
                 }
             };
 
-            function updateJsonTree(expr) {
-                var json_input = $(expr);
-                var json = $.parseJSON(json_input.val());
-                var json_tree = $('#jsonTreeTemplate').tmpl({json: json}, {fn: tmpl_fn_options}).insertAfter(json_input);
-                json_input.remove();
-                json_tree.treeview({
+            function updateTree(expr, type) {
+                var input = $(expr), tree;
+                if (type == 'json') {
+                    var json = $.parseJSON(input.val());
+                    tree = $('#jsonTreeTemplate').tmpl({json: json}, {fn: tmpl_fn_options}).insertAfter(input);
+                } else if (type == 'xml') {
+                    var xml = $.parseXML(input.val());
+                    tree = $('#xmlTreeTemplate').tmpl({xml: xml}, {fn: tmpl_fn_options}).insertAfter(input);
+                } else {
+                    return;
+                }
+                input.remove();
+                tree.treeview({
                     collapsed: true,
                     animated: "medium",
-                    control:"#sidetreecontrol",
-                    persist: "location"
-                });
-            }
-
-            function updateXmlTree(expr) {
-                var xml_input = $(expr);
-                var xmldoc = $.parseXML(xml_input.val());
-                var xml = $(xmldoc);
-                var xml_tree = $('#xmlTreeTemplate').tmpl({xml: xmldoc}, {fn: tmpl_fn_options}).insertAfter(xml_input);
-                //xml_input.remove();
-                xml_tree.treeview({
-                    collapsed: true,
-                    animated: "medium",
-                    control:"#sidetreecontrol",
+                    control:"#control",
                     persist: "location"
                 });
             }
@@ -139,7 +100,7 @@
             {{each json}}
                 <li>
                     <span>[${$index}]</span>
-                    {{tmpl({json: $value, root: false}, {fn: $item.fn}) "#jsonTreeValueTemplate"}}
+                    {{tmpl({json: $value, root: false}, {fn: $item.fn}) "#jsonTreeValueTemplate"}}{{if $index != json.length - 1}},&nbsp{{/if}}
                 </li>
             {{/each}}
         </ul>
@@ -417,11 +378,12 @@
             <apex:outputPanel id="response_body">
                 <input type="hidden" id="response_type" value="{!response_type}" />
                 <apex:outputText value="{!response_body}" rendered="{!response_type = 'plain'}" />
-                <apex:outputPanel rendered="{!response_type = 'json'}">
-                    <input type="hidden" id="response_json" value="{!response_body}" />
-                </apex:outputPanel>
-                <apex:outputPanel rendered="{!response_type = 'xml'}">
-                    <input type="hidden" id="response_xml" value="{!response_body}" />
+                <apex:outputPanel rendered="{!response_type = 'json' || response_type = 'xml'}">
+                    <div id="control">
+                        <a title="Collapse the entire tree below" href="#">Collapse All</a>
+                        <a title="Expand the entire tree below" href="#">Expand All</a>
+                    </div>
+                    <input type="hidden" id="response_body" value="{!response_body}" />
                 </apex:outputPanel>
             </apex:outputPanel>
         </div>
