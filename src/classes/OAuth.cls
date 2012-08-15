@@ -164,7 +164,6 @@ public virtual class OAuth {
         return new Http().send(req);
     }
     protected virtual String getResponseBody(HttpResponse res) {
-        //'oauth_token=token&oauth_token_secret=token_secret'
         return res.getBody();
     }
     protected virtual Integer getStatusCode(HttpResponse res) {
