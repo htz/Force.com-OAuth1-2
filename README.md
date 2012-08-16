@@ -39,8 +39,21 @@ The code has been tested with the following services:
 * GitHub
 
 ### Apex Classes
+* OAuth.cls
+* OAuthException.cls (extends Exception)
+* OAuth1.cls (extends OAuth)
+* OAuthSign.cls
+* OAuth1Exception.cls (extends OAuthException)
+* OAuth2.cls (extends OAuth)
+* OAuth2Exception.cls (extends OAuthException)
+* OAuthJSON.cls
+* OAuthJSONException.cls (extends OAuthException)
 
 ### Sample Code
+* OAuthTwitterSampleController.cls
+* OAuthTwitterSample.page
+
+**Create "OAuth Service" record of Name field as "Twitter".**
 
 ## Reference RFC
 * http://tools.ietf.org/html/draft-ietf-oauth-v2-31
