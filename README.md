@@ -1,4 +1,4 @@
-# Apex OAuth 1.0/2.0 Consumer with Test Playground
+# Force.com OAuth 1.0 and 2.0 Developer Kit with API Tester
 
 ## Introduction
 This project was copied over from &quot;<https://github.com/jesperfj/sfdc-oauth-playground> by Jesper Joergensen&quot;, since I do all my projects on github now. I don't expect to make any changes, so the two locations will likely stay in sync but this is now the main project home.
