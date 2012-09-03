@@ -93,6 +93,7 @@
     </fields>
     <fields>
         <fullName>Redirect_URL__c</fullName>
+        <defaultValue>&quot;/apex/OAuthComplete&quot;</defaultValue>
         <externalId>false</externalId>
         <label>Redirect URL</label>
         <required>false</required>
