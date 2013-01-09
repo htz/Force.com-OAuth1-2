@@ -56,6 +56,7 @@ The code has been tested with the following services:
 **Create "OAuth Service" record of Name field as "Twitter".**
 
 ## Reference RFC
+* [RFC 5849](http://tools.ietf.org/html/rfc5849) - The OAuth 1.0 Protocol
 * [RFC 6749](http://tools.ietf.org/html/rfc6749) - The OAuth 2.0 Authorization Framework
 * [RFC 6750](http://tools.ietf.org/html/rfc6750) - The OAuth 2.0 Authorization Framework: Bearer Token Usage
 
