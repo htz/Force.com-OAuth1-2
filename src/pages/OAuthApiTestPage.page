@@ -240,7 +240,7 @@
             <apex:param assignTo="{!action_index}" name="selected_item" value=""/>
         </apex:actionFunction>
         <apex:pageBlock mode="edit">
-            <table>
+            <table style="width: 100%">
                 <tr>
                     <th>Service:</th>
                     <td>

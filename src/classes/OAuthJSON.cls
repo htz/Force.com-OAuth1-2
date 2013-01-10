@@ -253,7 +253,7 @@ public class OAuthJSON {
         OAuthJSON val = null;
         if (parser.getCurrentToken() == JSONToken.VALUE_NULL) {
             val = OAuthJSON.newNullInstance();
-            val.string_value = parser.getText();
+            val.string_value = '';
         } else if (parser.getCurrentToken() == JSONToken.VALUE_NUMBER_INT) {
             try {
                 val = new OAuthJSON(parser.getIntegerValue());

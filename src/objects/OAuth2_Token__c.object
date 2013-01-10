@@ -96,6 +96,14 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>ResponseBody__c</fullName>
+        <externalId>false</externalId>
+        <label>Response Body</label>
+        <length>32768</length>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
         <fullName>Scope__c</fullName>
         <externalId>false</externalId>
         <label>Scope</label>

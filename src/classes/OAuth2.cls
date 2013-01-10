@@ -1,5 +1,5 @@
 public virtual class OAuth2 extends OAuth {
-    private OAuth2_Token__c token;
+    public OAuth2_Token__c token {get; private set;}
 
     public OAuth2() {
     }
@@ -86,6 +86,9 @@ public virtual class OAuth2 extends OAuth {
 
     /* Authorization Code Grant */
     public Boolean getAccessTokenAuthorizationCode(String code) {
+        return getAccessTokenAuthorizationCode(code, true);
+    }
+    public Boolean getAccessTokenAuthorizationCode(String code, Boolean is_save) {
         String body =
             getAccessTokenCommonBody('authorization_code', service.Scope__c) + // scope間違い
             '&client_secret=' + EncodingUtil.urlEncode(service.Consumer_Secret__c, 'UTF-8') +
@@ -94,7 +97,7 @@ public virtual class OAuth2 extends OAuth {
             body += '&redirect_uri=' + EncodingUtil.urlEncode(service.Redirect_URL__c, 'UTF-8');
         }
         token = getAccessToken(body);
-        insert token;
+        if (is_save) insert token;
         return true;
     }
 
@@ -102,13 +105,16 @@ public virtual class OAuth2 extends OAuth {
 
     /* Resource Owner Password Credentials Grant */
     public Boolean getAccessTokenAuthorizationPassword(String username, String password) {
+        return getAccessTokenAuthorizationPassword(username, password, true);
+    }
+    public Boolean getAccessTokenAuthorizationPassword(String username, String password, Boolean is_save) {
         String body =
             getAccessTokenCommonBody('password', service.Scope__c) + // scope間違い
             '&client_secret=' + EncodingUtil.urlEncode(service.Consumer_Secret__c, 'UTF-8') +
             '&username=' + EncodingUtil.urlEncode(username, 'UTF-8') +
             '&password=' + EncodingUtil.urlEncode(password, 'UTF-8');
         token = getAccessToken(body);
-        insert token;
+        if (is_save) insert token;
         return true;
     }
 
@@ -138,6 +144,7 @@ public virtual class OAuth2 extends OAuth {
         if (t.Scope__c != null) {
             token.Scope__c = t.Scope__c;
         }
+        t.ResponseBody__c = t.ResponseBody__c;
         return true;
     }
 
@@ -184,7 +191,8 @@ public virtual class OAuth2 extends OAuth {
             Token_Type__c = parameters.get('token_type'),
             Expires_In__c = expires_in,
             Refresh_Token__c = parameters.get('refresh_token'),
-            Scope__c = parameters.get('scope')
+            Scope__c = parameters.get('scope'),
+            ResponseBody__c = res_body
         );
         return t;
     }
