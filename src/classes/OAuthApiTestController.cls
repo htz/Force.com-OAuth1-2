@@ -206,15 +206,25 @@ public class OAuthApiTestController {
             request_body = req.getBody();
             response = 'HTTP/1.1 ' + res.getStatusCode() + ' ' + res.getStatus();
             response_headers = getResponseHeaders(res);
-            response_body = res.getBody();
             String type = res.getHeader('Content-Type');
-            response_type = 'plain';
             if (type != null) {
-                if (type.startsWith('application/json')) {
+                if (type.startsWith('application/json') || type.startsWith('text/javascript')) {
                     response_type = 'json';
+                    response_body = res.getBody();
                 } else if (type.startsWith('application/xml')) {
                     response_type ='xml';
+                    response_body = res.getBody();
+                } else if (type.startsWith('image/')) {
+                    response_type = 'image';
+                    String response_body_b64 = EncodingUtil.base64Encode(res.getBodyAsBlob());
+                    response_body = 'data:' + type + ';base64,' + response_body_b64;
+                } else {
+                    response_type = 'plain';
+                    response_body = res.getBody();
                 }
+            } else {
+                response_type = 'plain';
+                response_body = res.getBody();
             }
     }
 

@@ -30,6 +30,7 @@ The code has been tested with the following services:
 * TripIt
 * Dropbox
 * Hatena
+* Cacoo
 
 **Oauth 2.0**
 * Salesforce

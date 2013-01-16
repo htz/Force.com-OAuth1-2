@@ -385,6 +385,7 @@
                     </div>
                     <input type="hidden" id="response_body" value="{!response_body}" />
                 </apex:outputPanel>
+                <apex:image value="{!response_body}" rendered="{!response_type = 'image'}" />
             </apex:outputPanel>
         </div>
         <div label="Debug">
