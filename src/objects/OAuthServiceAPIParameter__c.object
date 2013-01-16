@@ -38,6 +38,14 @@
     <enableHistory>false</enableHistory>
     <enableReports>false</enableReports>
     <fields>
+        <fullName>Help__c</fullName>
+        <externalId>false</externalId>
+        <label>Help</label>
+        <length>32768</length>
+        <type>LongTextArea</type>
+        <visibleLines>3</visibleLines>
+    </fields>
+    <fields>
         <fullName>OAuth_Service_API__c</fullName>
         <externalId>false</externalId>
         <label>OAuth Service API</label>

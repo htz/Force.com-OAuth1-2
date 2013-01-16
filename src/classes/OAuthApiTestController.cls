@@ -211,7 +211,7 @@ public class OAuthApiTestController {
                 if (type.startsWith('application/json') || type.startsWith('text/javascript')) {
                     response_type = 'json';
                     response_body = res.getBody();
-                } else if (type.startsWith('application/xml')) {
+                } else if (type.startsWith('application/xml') || type.startsWith('text/xml')) {
                     response_type ='xml';
                     response_body = res.getBody();
                 } else if (type.startsWith('image/')) {
