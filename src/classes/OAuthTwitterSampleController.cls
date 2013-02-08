@@ -25,7 +25,7 @@ public class OAuthTwitterSampleController {
             HttpResponse res = null;
             String body = null;
             if (!System.currentPageReference().getParameters().containsKey('@test')) {
-                res = oa.get('https://api.twitter.com/1/statuses/home_timeline.json');
+                res = oa.get('https://api.twitter.com/1.1/statuses/home_timeline.json');
                 body = res.getBody();
             } else {
                 body = '[]';
@@ -41,7 +41,7 @@ public class OAuthTwitterSampleController {
     public PageReference post() {
         if (status == null || status == '') return null;
         HttpRequest req = new HttpRequest();
-        req.setEndPoint('https://api.twitter.com/1/statuses/update.json');
+        req.setEndPoint('https://api.twitter.com/1.1/statuses/update.json');
         req.setMethod('POST');
         req.setBody('status=' + EncodingUtil.urlEncode(status, 'UTF-8'));
         try {
