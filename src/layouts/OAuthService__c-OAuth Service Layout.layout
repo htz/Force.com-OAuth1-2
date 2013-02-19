@@ -21,6 +21,10 @@
                 <field>Consumer_Secret__c</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Required</behavior>
+                <field>Signature_Method__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Authorization_Type__c</field>
             </layoutItems>

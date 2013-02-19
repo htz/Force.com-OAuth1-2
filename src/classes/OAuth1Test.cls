@@ -1,12 +1,13 @@
 @isTest
 private class OAuth1Test {
-    public static OAuthService__c createTestService() {
+    public static OAuthService__c createTestService(String signature_method) {
         Schema.DescribeSObjectResult d = Schema.SObjectType.OAuthService__c;
         Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
         OAuthService__c s = new OAuthService__c(
             Name = 'test1234',
             Consumer_Key__c = 'consumerkey',
             Consumer_Secret__c = 'consumersecret',
+            Signature_Method__c = signature_method,
             Access_Token_URL__c = 'https://test/oauth/token',
             Authorization_URL__c = 'https://test/oauth/auth',
             Redirect_URL__c = 'https://localhost/oauth/done',
@@ -32,7 +33,7 @@ private class OAuth1Test {
     }
 
     public static testMethod void testNewService() {
-        OAuthService__c s = createTestService();
+        OAuthService__c s = createTestService('HMAC-SHA1');
         OAuth_Token__c t = createTestToken(s, true);
         Test.startTest();
         // success
@@ -53,8 +54,39 @@ private class OAuth1Test {
         Test.stopTest();
     }
 
-    public static testMethod void testOAuth() {
-        OAuthService__c s1 = createTestService();
+    public static testMethod void testHmacSha1OAuth() {
+        OAuthService__c s1 = createTestService('HMAC-SHA1');
+        Test.startTest();
+        // success
+        OAuth1Tester o1 = new OAuth1Tester(s1);
+        o1.authorization();
+        PageReference complete_page = new PageReference('/oauth/done?oauth_token=token');
+        complete_page.getHeaders().put('Host', 'localhost');
+        OAuth1Tester o2 = new OAuth1Tester(s1, complete_page);      
+        System.assert(o2.isCompleteUrl());  
+        o2.complete(new Map<String, String> {
+            'oauth_token' => 'token'
+        });
+        OAuth1Tester o3 = new OAuth1Tester(s1, new OAuth1Tester.Response('{}', 200));
+        System.assert(o3.hasToken());
+        HttpRequest req = new HttpRequest();
+        req.setEndPoint('https://example/test?page=1&max=100&a=100');
+        req.setMethod('POST');
+        req.setBody('a=b&c=d');
+        OAuthJSON json = o3.json(req);
+        json.inspect();
+        // error
+        try {
+            OAuth1Tester oe1 = new OAuth1Tester(s1, new OAuth1Tester.Response('', 500));
+            oe1.authorization();
+            System.assert(false);
+        } catch (OAuthException e) {
+        }
+        Test.stopTest();
+    }
+
+    public static testMethod void testPlaintextOAuth() {
+        OAuthService__c s1 = createTestService('PLAINTEXT');
         Test.startTest();
         // success
         OAuth1Tester o1 = new OAuth1Tester(s1);

@@ -113,24 +113,33 @@ public class OAuthSign {
         return signature;
     }
 
-    private String getSignature(HttpRequest req, String consumer_secret, String token_secret) {
+    private String getSignature(HttpRequest req, String signature_method, String consumer_secret, String token_secret) {
         String str = getSignatureBaseString(req);
         System.debug('Signature base string: ' + str);
         String secret = percentEncode(consumer_secret) + '&';
         if (token_secret != null) {
             secret += percentEncode(token_secret);
         }
-        System.debug('HmacSHA1 secret: ' + secret);
-        Blob sig = Crypto.generateMac(
-            'HmacSHA1',
-            Blob.valueOf(str),
-            Blob.valueOf(secret)
-        );
-        return EncodingUtil.base64encode(sig);
+        System.debug('signature_method: ' + signature_method);
+        if (signature_method == 'HMAC-SHA1') {
+            Blob sig = Crypto.generateMac(
+                'HmacSHA1',
+                Blob.valueOf(str),
+                Blob.valueOf(secret)
+            );
+            return EncodingUtil.base64encode(sig);
+        } else if (signature_method == 'PLAINTEXT') {
+            return secret;
+        }
+        return '';
     }
 
     public String getAuthorizationHeader(HttpRequest req, String consumer_secret, String token_secret) {
-        String signature = getSignature(req, consumer_secret, (token_secret != null ? token_secret : ''));
+        String signature_method = '';
+        if (this.parameters.get('oauth_signature_method').size() > 0) {
+            signature_method = this.parameters.get('oauth_signature_method')[0];
+        }
+        String signature = getSignature(req, signature_method, consumer_secret, (token_secret != null ? token_secret : ''));
         System.debug('Signature: ' + signature);
         put('oauth_signature', signature);
 

@@ -10,7 +10,7 @@ public virtual class OAuth1 extends OAuth {
                 Select
                     Name,
                     Request_Token_URL__c, Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c,
-                    Consumer_Key__c, Consumer_Secret__c,
+                    Consumer_Key__c, Consumer_Secret__c, Signature_Method__c,
                     (Select OAuth_Token__c, OAuth_Token_Secret__c, isAccess__c FROM OAuth_Tokens__r WHERE Owner__c = :userId Order By CreatedDate DESC Limit 1)
                 From
                     OAuthService__c
@@ -133,7 +133,7 @@ public virtual class OAuth1 extends OAuth {
         if (token != null && token.OAuth_Token__c != null) {
             parameters.put('oauth_token', token.OAuth_Token__c);
         }
-        parameters.put('oauth_signature_method', 'HMAC-SHA1');
+        parameters.put('oauth_signature_method', service.Signature_Method__c);
         parameters.put('oauth_timestamp', String.valueOf(DateTime.now().getTime() / 1000));
         parameters.put('oauth_nonce', generateNonce());
         parameters.put('oauth_version', '1.0');

@@ -132,6 +132,23 @@
         <type>Text</type>
         <unique>false</unique>
     </fields>
+    <fields>
+        <fullName>Signature_Method__c</fullName>
+        <externalId>false</externalId>
+        <label>Signature Method</label>
+        <picklist>
+            <picklistValues>
+                <fullName>HMAC-SHA1</fullName>
+                <default>true</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>PLAINTEXT</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <type>Picklist</type>
+    </fields>
     <label>OAuth Service</label>
     <listViews>
         <fullName>All</fullName>
@@ -176,6 +193,17 @@
                 <default>false</default>
             </values>
         </picklistValues>
+        <picklistValues>
+            <picklist>Signature_Method__c</picklist>
+            <values>
+                <fullName>HMAC-SHA1</fullName>
+                <default>true</default>
+            </values>
+            <values>
+                <fullName>PLAINTEXT</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
     </recordTypes>
     <recordTypes>
         <fullName>OAuth2</fullName>
@@ -205,6 +233,17 @@
             </values>
             <values>
                 <fullName>token</fullName>
+                <default>false</default>
+            </values>
+        </picklistValues>
+        <picklistValues>
+            <picklist>Signature_Method__c</picklist>
+            <values>
+                <fullName>HMAC-SHA1</fullName>
+                <default>true</default>
+            </values>
+            <values>
+                <fullName>PLAINTEXT</fullName>
                 <default>false</default>
             </values>
         </picklistValues>
