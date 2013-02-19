@@ -108,6 +108,18 @@ public virtual class OAuth1 extends OAuth {
         }
 
         Map<String, String> rp = splitParameters(getResponseBody(res));
+        
+				List<OAuthServiceVariable__c> serviceVars = [SELECT Name, 
+																											Value__c 
+																										FROM OAuthServiceVariable__c 
+																										WHERE OAuth_Service__c = :service.Id];
+        for(OAuthServiceVariable__c sv : serviceVars){
+            if(rp.containsKey(sv.Name)) {
+                sv.Value__c = rp.get(sv.Name);
+            }
+        }
+        upsert serviceVars;
+
         token.OAuth_Token__c = rp.get('oauth_token');
         token.OAuth_Token_Secret__c = rp.get('oauth_token_secret');
         token.isAccess__c = true;
