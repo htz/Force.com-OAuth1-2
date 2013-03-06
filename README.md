@@ -7,10 +7,10 @@ This project provides a basic Oauth 1.0/2.0 consumer implementation in Apex. It 
 
 ## Package
 * Package Name: OAuth Development Kit
-* Version: 1.8
-* Last Update: 2013/01/16 12:11
-* Install URL: [Install](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001DGJE)
-* Commit: [06e62beda2127162b23c73bc60bde93927a9e50b](https://github.com/htz/Force.com-OAuth1-2/commit/06e62beda2127162b23c73bc60bde93927a9e50b)
+* Version: 1.9
+* Last Update: 2013/03/06 15:43
+* Install URL: [Install](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t30000001DJNx)
+* Commit: [047ecdeafcce1efe6a798ddf0b022b33287e106a](https://github.com/htz/Force.com-OAuth1-2/commit/047ecdeafcce1efe6a798ddf0b022b33287e106a)
 
 ## About this project
 
