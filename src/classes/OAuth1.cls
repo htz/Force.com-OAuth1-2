@@ -107,10 +107,23 @@ public virtual class OAuth1 extends OAuth {
             throw new OAuth1Exception(res);
         }
 
-        Map<String, String> rp = splitParameters(getResponseBody(res));
+        String res_body = getResponseBody(res);
+        Map<String, String> rp = splitParameters(res_body);
         token.OAuth_Token__c = rp.get('oauth_token');
         token.OAuth_Token_Secret__c = rp.get('oauth_token_secret');
         token.isAccess__c = true;
+
+        List<OAuth_Token_Variable__c> variables = new List<OAuth_Token_Variable__c>();
+        for (String key : rp.keySet()) {
+            if (key == 'oauth_token' || key == 'oauth_token_secret') continue;
+            variables.add(new OAuth_Token_Variable__c(
+                Name = key,
+                OAuth_Token__c = token.Id,
+                Value__c = rp.get(key)
+            ));
+        }
+        upsert variables;
+
         update token;
 
         return true;

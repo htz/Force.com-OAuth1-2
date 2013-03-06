@@ -41,7 +41,7 @@ public class OAuth1Tester extends OAuth1 {
         return new HttpResponse();
     }
     public override String getResponseBody(HttpResponse res) {
-        String body = 'oauth_token=token&oauth_token_secret=token_secret';
+        String body = 'oauth_token=token&oauth_token_secret=token_secret&test=1';
         if (responses.size() > 0) {
             body = responses[0].body;
         }
@@ -81,7 +81,7 @@ public class OAuth1Tester extends OAuth1 {
             this(body, code, 'application/x-www-form-urlencoded');
         }
         public Response() {
-            this('oauth_token=token&oauth_token_secret=token_secret', 200);
+            this('oauth_token=token&oauth_token_secret=token_secret&test=1', 200);
         }
     }
 }
