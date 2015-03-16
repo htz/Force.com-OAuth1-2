@@ -99,7 +99,7 @@ private class OAuthTest {
         Test.startTest();
         OAuth.splitParameters('');
         OAuth.splitParameters('test=a');
-        OAuth.parseJsonParameters('{"a":1,"b":12345678901234567890123456789012345678901234567890,"c":3.1415926535,"d":"test","e":false,"f":true,"g":[1,2,3],"h":{"z":0},"i":null}');
+        OAuth.parseJsonParameters('{"a":1,"b":1234567890,"c":3.1415926535,"d":"test","e":false,"f":true,"g":[1,2,3],"h":{"z":0},"i":null}');
         Test.stopTest();
     }
 }
