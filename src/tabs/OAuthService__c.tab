@@ -2,5 +2,5 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <customObject>true</customObject>
     <mobileReady>false</mobileReady>
-    <motif>Custom77: Locked</motif>
+    <motif>Custom77: ロック</motif>
 </CustomTab>

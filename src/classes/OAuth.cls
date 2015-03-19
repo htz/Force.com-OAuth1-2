@@ -8,20 +8,17 @@ public virtual class OAuth {
         this();
         this.service = service;
         if (service == null) {
-            System.debug('Couldn\'t find Oauth Service');
+            System.debug('Couldn\'t find OAuth Service');
             this.message = 'Service was not found in the local configuration';
         }
     }
 
     public static OAuth newInstance(OAuthService__c service) {
         OAuth oa = null;
-        Schema.DescribeSObjectResult d = Schema.SObjectType.OAuthService__c;
-        Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
-
         try {
-            if (service.RecordTypeId == rti.get('OAuth 1.0').getRecordTypeId()) {
+            if (service.RecordTypeId == OAuthUtil.getOAuthServiceRecordTypeId('OAuth1')) {
                 oa = new OAuth1(service.Id);
-            } else if (service.RecordTypeId == rti.get('OAuth 2.0').getRecordTypeId()) {
+            } else if (service.RecordTypeId == OAuthUtil.getOAuthServiceRecordTypeId('OAuth2')) {
                 oa = new OAuth2(service.Id);
             }
         } catch (OAuthException e) {
@@ -49,7 +46,7 @@ public virtual class OAuth {
         PageReference current = currentPage();
         if (current != null) {
             String host = current.getHeaders().get('Host');
-            String url_http = 'https://' + host + current.getUrl();
+            String url_http = 'http://' + host + current.getUrl();
             String url_https = 'https://' + host + current.getUrl();
             if (url_http.startsWith(service.Redirect_URL__c) || url_https.startsWith(service.Redirect_URL__c)) {
                 return true;
@@ -121,11 +118,11 @@ public virtual class OAuth {
     }
 
     public virtual HttpResponse rest(HttpRequest req) {
-        return null;
+        return new Http().send(req);
     }
     public OAuthJSON json(HttpRequest req) {
         HttpResponse res = rest(req);
-        String body = getResponseBody(res);
+        String body = res.getBody();
         OAuthJSON json = null;
         if (body != null && body != '') {
             json = OAuthJSON.newInstance(body);
@@ -158,18 +155,5 @@ public virtual class OAuth {
     }
     public HttpResponse patch(String url, String body) {
         return rest('PATCH', url, body);
-    }
-
-    protected virtual HttpResponse send(HttpRequest req) {
-        return new Http().send(req);
-    }
-    protected virtual String getResponseBody(HttpResponse res) {
-        return res.getBody();
-    }
-    protected virtual Integer getStatusCode(HttpResponse res) {
-        return res.getStatusCode();
-    }
-    protected virtual String getContentType(HttpResponse res) {
-        return res.getHeader('Content-Type');
     }
 }

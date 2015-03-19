@@ -121,7 +121,6 @@
         <label>Parameter Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Service API Parameters</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
 </CustomObject>

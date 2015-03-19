@@ -149,7 +149,6 @@
         <label>OAuth2 Token No</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>OAuth2 Tokens</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
 </CustomObject>

@@ -19,7 +19,7 @@ public virtual class OAuth1 extends OAuth {
                 Limit 1
             ];
             if (service.OAuth_Tokens__r.size() > 0) {
-                token = service.OAuth_Tokens__r.get(0);
+                token = service.OAuth_Tokens__r[0];
             }
         } catch (Exception e) {
             throw new OAuth1Exception('no service');
@@ -50,12 +50,13 @@ public virtual class OAuth1 extends OAuth {
             service.Redirect_URL__c = 'oob';
         }
         HttpResponse res = signSend(req, new Map<String, String>{'oauth_callback' => service.Redirect_URL__c});
-        System.debug('Response from request token request: (' + getStatusCode(res) + ')' + getResponseBody(res));
-        if (getStatusCode(res) > 299) {
+        System.debug('Response from request token request: (' + res.getStatusCode() + ')' + res.getBody());
+        if (res.getStatusCode() >= 300) {
             throw new OAuth1Exception(res);
         }
 
-        Map<String, String> rp = splitParameters(getResponseBody(res));
+        String res_body = res.getBody();
+        Map<String, String> rp = splitParameters(res_body);
         OAuth_Token__c t = new OAuth_Token__c(
             Owner__c = UserInfo.getUserId(),
             OAuth_Service__c = service.Id,
@@ -92,9 +93,7 @@ public virtual class OAuth1 extends OAuth {
     }
 
     public Boolean getAccessToken(String verifier) {
-        if (verifier == null) {
-            verifier = '';
-        }
+        if (verifier == null) verifier = '';
         System.debug('Completing authorization for request verifier = ' + verifier);
 
         HttpRequest req = new HttpRequest();
@@ -102,12 +101,12 @@ public virtual class OAuth1 extends OAuth {
         req.setEndpoint(service.Access_Token_URL__c);
         req.setBody('');
         HttpResponse res = signSend(req, new Map<String, String>{'oauth_verifier' => verifier});
-        System.debug('Response from request token request: (' + getStatusCode(res) + ')' + getResponseBody(res));
-        if (getStatusCode(res) > 299) {
+        System.debug('Response from request token request: (' + res.getStatusCode() + ')' + res.getBody());
+        if (res.getStatusCode() >= 300) {
             throw new OAuth1Exception(res);
         }
 
-        String res_body = getResponseBody(res);
+        String res_body = res.getBody();
         Map<String, String> rp = splitParameters(res_body);
         token.OAuth_Token__c = rp.get('oauth_token');
         token.OAuth_Token_Secret__c = rp.get('oauth_token_secret');
@@ -169,7 +168,7 @@ public virtual class OAuth1 extends OAuth {
         String header = sign.getAuthorizationHeader(req, service.Consumer_Secret__c, (token != null && token.OAuth_Token_Secret__c != null ? token.OAuth_Token_Secret__c : ''));
         System.debug('Authorization: ' + header);
         req.setHeader('Authorization', header);
-        return send(req);
+        return new Http().send(req);
     }
 
     public override Boolean hasToken() {

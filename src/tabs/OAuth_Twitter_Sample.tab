@@ -2,6 +2,6 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>OAuth Twitter Sample</label>
     <mobileReady>false</mobileReady>
-    <motif>Custom6: Triangle</motif>
+    <motif>Custom11: 星</motif>
     <page>OAuthTwitterSample</page>
 </CustomTab>

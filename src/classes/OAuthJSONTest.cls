@@ -47,6 +47,7 @@ private class OAuthJSONTest {
 
     public static testMethod void testParser() {
         OAuthJSON json = OAuthJSON.newInstance('{"a":1,"b":12345678901234567890123456789012345678901234567890,"c":3.1415926535,"d":"test","e":false,"f":true,"g":[1,2,3],"h":{"z":0},"i":null}');
+        json.to_s();
     }
 
     public static testMethod void testException() {

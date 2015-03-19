@@ -184,7 +184,6 @@
         <label>Service Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Services</pluralLabel>
     <recordTypes>
         <fullName>OAuth1</fullName>
         <active>true</active>

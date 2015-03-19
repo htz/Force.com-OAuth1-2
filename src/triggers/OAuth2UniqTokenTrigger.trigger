@@ -1,4 +1,4 @@
-trigger OAuth2UniqToken on OAuth2_Token__c (before insert) {
+trigger OAuth2UniqTokenTrigger on OAuth2_Token__c (before insert) {
     List<OAuth2_Token__c> delete_list = new List<OAuth2_Token__c>();
 
     for (OAuth2_Token__c t : Trigger.new) {

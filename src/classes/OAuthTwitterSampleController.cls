@@ -24,12 +24,8 @@ public class OAuthTwitterSampleController {
         try {
             HttpResponse res = null;
             String body = null;
-            if (!System.currentPageReference().getParameters().containsKey('@test')) {
-                res = oa.get('https://api.twitter.com/1.1/statuses/home_timeline.json');
-                body = res.getBody();
-            } else {
-                body = '[]';
-            }
+            res = oa.get('https://api.twitter.com/1.1/statuses/home_timeline.json');
+            body = res.getBody();
             if (body != null && body != '') {
                 json = OAuthJSON.newInstance(body);
             }
@@ -45,9 +41,7 @@ public class OAuthTwitterSampleController {
         req.setMethod('POST');
         req.setBody('status=' + EncodingUtil.urlEncode(status, 'UTF-8'));
         try {
-            if (!System.currentPageReference().getParameters().containsKey('@test')) {
-                oa.rest(req);
-            }
+            oa.rest(req);
             status = '';
         } catch (OAuthException e) {
         }

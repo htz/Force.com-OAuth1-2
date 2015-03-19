@@ -117,7 +117,6 @@
         <label>API Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Service APIs</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
 </CustomObject>

@@ -233,8 +233,6 @@ public class OAuthJSON {
                 str += '"' + String.escapeSingleQuotes(keys[i]) + '": ' + get(keys[i]).inspect();
             }
             str += '}';
-        } else {
-            str = '<#Error>';
         }
 
         return str;

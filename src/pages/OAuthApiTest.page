@@ -7,7 +7,6 @@
     <!-- tab settings end -->
     <script type="text/javascript" src="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.min.js')}"></script>
     <script type="text/javascript" src="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.tmpl.min.js')}"></script>
-    <script type="text/javascript" src="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.treeview/lib/jquery.cookie.js')}"></script>
     <script type="text/javascript" src="{!URLFOR($Resource.OAuthTesterLibs, 'jquery.treeview/jquery.treeview.js')}"></script>
     <script type="text/javascript">
         var refresh = function () {};
@@ -60,7 +59,7 @@
                             if (i == 0) $(tab).find('.tab #' + id).addClass('active');
                             else $(this).hide();
                         }).end()
-                        .find('.tab li').live('click', function() {
+                        .find('.tab li').on('click', function() {
                             var id = $(this).attr('id');
                             $(tab).find('.tabBody').hide().filter('.tabBody#' + id).show();
                             $(this)

@@ -78,7 +78,6 @@
         <label>Variable Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>OAuth Token Variables</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
 </CustomObject>

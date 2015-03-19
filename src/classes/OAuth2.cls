@@ -90,7 +90,7 @@ public virtual class OAuth2 extends OAuth {
     }
     public Boolean getAccessTokenAuthorizationCode(String code, Boolean is_save) {
         String body =
-            getAccessTokenCommonBody('authorization_code', service.Scope__c) + // scope間違い
+            getAccessTokenCommonBody('authorization_code', service.Scope__c) +
             '&client_secret=' + EncodingUtil.urlEncode(service.Consumer_Secret__c, 'UTF-8') +
             '&code=' + EncodingUtil.urlEncode(code, 'UTF-8');
         if (service.Redirect_URL__c != null) {
@@ -109,7 +109,7 @@ public virtual class OAuth2 extends OAuth {
     }
     public Boolean getAccessTokenAuthorizationPassword(String username, String password, Boolean is_save) {
         String body =
-            getAccessTokenCommonBody('password', service.Scope__c) + // scope間違い
+            getAccessTokenCommonBody('password', service.Scope__c) +
             '&client_secret=' + EncodingUtil.urlEncode(service.Consumer_Secret__c, 'UTF-8') +
             '&username=' + EncodingUtil.urlEncode(username, 'UTF-8') +
             '&password=' + EncodingUtil.urlEncode(password, 'UTF-8');
@@ -126,7 +126,8 @@ public virtual class OAuth2 extends OAuth {
             return false;
         }
         String body =
-            getAccessTokenCommonBody('refresh_token', service.Scope__c) + // scope間違い
+            getAccessTokenCommonBody('refresh_token') +
+            '&client_secret=' + EncodingUtil.urlEncode(service.Consumer_Secret__c, 'UTF-8') +
             '&refresh_token=' + EncodingUtil.urlEncode(token.Refresh_Token__c, 'UTF-8');
         OAuth2_Token__c t = getAccessToken(body);
         if (t.Access_Token__c != null) {
@@ -155,10 +156,10 @@ public virtual class OAuth2 extends OAuth {
         req.setMethod('POST');
         req.setEndpoint(service.Access_Token_URL__c);
         req.setBody(body);
-        HttpResponse res = send(req);
+        HttpResponse res = new Http().send(req);
 
-        String res_body = getResponseBody(res);
-        String res_content_type = getContentType(res);
+        String res_body = res.getBody();
+        String res_content_type = res.getHeader('Content-Type');
         System.debug('res_body(' + res_content_type+ ') = ' + res_body);
         if (res_body == null) {
             throw new OAuth2Exception('res_body = null');
@@ -203,13 +204,13 @@ public virtual class OAuth2 extends OAuth {
 
     public override HttpResponse rest(HttpRequest req) {
         setAuthrization(req);
-        HttpResponse res = send(req);
+        HttpResponse res = new Http().send(req);
         Integer status_code = res.getStatusCode();
         if (status_code / 100 == 4) {
             OAuth2Exception e = new OAuth2Exception(res); 
             if (/*e.error == 'expired_token' && */getAccessTokenRefreshToken()) {
                 setAuthrization(req);
-                res = send(req);
+                res = new Http().send(req);
                 update token;
                 return res;
             }
@@ -219,9 +220,7 @@ public virtual class OAuth2 extends OAuth {
     }
 
     private void setAuthrization(HttpRequest req) {
-        if (token == null || service.Authorization_Type__c == null) {
-            return;
-        }
+        if (token == null || service.Authorization_Type__c == null) return;
         if (service.Authorization_Type__c == 'Request Header (Authorization: Bearer)') {
             req.setHeader('Authorization', 'Bearer ' + token.Access_Token__c);
         } else if (service.Authorization_Type__c == 'Request Header (Authorization: OAuth)') {
