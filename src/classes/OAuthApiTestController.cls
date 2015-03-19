@@ -206,8 +206,13 @@ public class OAuthApiTestController {
             request_body = req.getBody();
             response = 'HTTP/1.1 ' + res.getStatusCode() + ' ' + res.getStatus();
             response_headers = getResponseHeaders(res);
-            String type = res.getHeader('Content-Type');
+            Map<String, String> lowercase_response_headers = new Map<String, String>();
+            for (String key : response_headers.keySet()) {
+                lowercase_response_headers.put(key.toLowerCase(), response_headers.get(key));
+            }
+            String type = lowercase_response_headers.get('content-type');
             if (type != null) {
+                type = type.split(';')[0].trim();
                 if (type.startsWith('application/json') || type.startsWith('text/javascript')) {
                     response_type = 'json';
                     response_body = res.getBody();
