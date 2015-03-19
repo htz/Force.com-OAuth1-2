@@ -1,8 +1,6 @@
 @isTest
 private class OAuth2Test {
     public static OAuthService__c createTestService(String authorizationType) {
-        Schema.DescribeSObjectResult d = Schema.SObjectType.OAuthService__c;
-        Map<String, Schema.RecordTypeInfo> rti = d.getRecordTypeInfosByName();
         OAuthService__c s = new OAuthService__c(
             Name = 'test1234',
             Consumer_Key__c = 'consumerkey',
@@ -11,7 +9,7 @@ private class OAuth2Test {
             Authorization_URL__c = 'https://test/oauth2/auth',
             Redirect_URL__c = 'https://localhost/oauth2/done',
             OwnerId = UserInfo.getUserId(),
-            RecordTypeId = rti.get('OAuth 2.0').getRecordTypeId(),
+            RecordTypeId = OAuthUtil.getOAuthServiceRecordTypeId('OAuth2'),
             Scope__c = 'full',
             Authorization_Type__c = authorizationType
         );
