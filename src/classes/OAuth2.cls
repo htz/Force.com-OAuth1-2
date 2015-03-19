@@ -17,9 +17,10 @@ public virtual class OAuth2 extends OAuth {
                         From
                             OAuth2_Tokens__r
                         Where
-                            Owner__c = :userId
+                            Owner__c = :userId Or
+                            Is_Private__c = false
                         Order By
-                            CreatedDate DESC
+                            Owner__c NULLS LAST
                         Limit 1
                     )
                 From

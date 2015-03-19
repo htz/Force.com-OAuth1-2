@@ -11,7 +11,18 @@ public virtual class OAuth1 extends OAuth {
                     Name,
                     Request_Token_URL__c, Authorization_URL__c, Access_Token_URL__c, Redirect_URL__c,
                     Consumer_Key__c, Consumer_Secret__c, Signature_Method__c,
-                    (Select OAuth_Token__c, OAuth_Token_Secret__c, isAccess__c FROM OAuth_Tokens__r WHERE Owner__c = :userId Order By CreatedDate DESC Limit 1)
+                    (
+                        Select
+                            OAuth_Token__c, OAuth_Token_Secret__c, isAccess__c
+                        From
+                            OAuth_Tokens__r
+                        WHERE
+                            Owner__c = :userId Or
+                            Is_Private__c = false
+                        Order By
+                            Owner__c NULLS LAST
+                        Limit 1
+                    )
                 From
                     OAuthService__c
                 WHERE
@@ -33,7 +44,18 @@ public virtual class OAuth1 extends OAuth {
         System.debug('Completing authorization for request token ' + token);
         try {
             Id userId = UserInfo.getUserId();
-            OAuth_Token__c t = [Select Id, Oauth_Service__r.Id From OAuth_Token__c Where Owner__c = :userId And OAuth_Token__c = :token Order By CreatedDate DESC Limit 1];
+            OAuth_Token__c t = [
+                Select
+                    Oauth_Service__r.Id
+                From
+                    OAuth_Token__c
+                Where
+                    Owner__c = :userId And
+                    OAuth_Token__c = :token
+                Order By
+                    CreatedDate DESC
+                Limit 1
+            ];
             return new OAuth1(t.Oauth_Service__r.Id);
         } catch (System.QueryException e) {
             throw new OAuth1Exception('no token');
